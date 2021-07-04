@@ -22,3 +22,6 @@ $ docker-compose down
 ```bash
 /go/src/github.com/ozaki-physics/go-training-composition# go mod init $REPOSITORY
 ```
+## 参考文献 References
+[Standard Go Project Layout](https://github.com/golang-standards/project-layout/blob/master/README_ja.md)  
+[Go の公式 github](https://github.com/golang/go)

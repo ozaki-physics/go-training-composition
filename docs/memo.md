@@ -36,3 +36,13 @@ docker 内の`/go/src/github.com/ozaki-physics/go-training-composition`にマウ
 1つのリポジトリには 1個のモジュールしか入れられない
 他のモジュールを使いたい場合は go mod を使って /pkg とかにインストールするらしい
 パッケージは複数作って良い
+
+## 試しに外部モジュールを インストールしてみる
+[Gin の公式サイトの Quickstart](https://gin-gonic.com/docs/quickstart/)
+`$ go get -u github.com/gin-gonic/gin`
+
+go.mod にどういう意味で記述されたのか?
+go.sum の意味は?
+どこに インストールされたのか?
+
+イメージを作り直さないと up -d するたびに go get される

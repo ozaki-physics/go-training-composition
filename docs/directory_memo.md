@@ -30,17 +30,27 @@ testdata や _ で始まるディレクトリは Go のパッケージとはみ�
 この git リポジトリを
 docker 内の`/go/src/github.com/ozaki-physics/go-training-composition`にマウントした
 モジュール名 github.com/ozaki-physics/go-training-composition
-パッケージ名 package-01
-パッケージ名 package-02
+パッケージ名 package01
+パッケージ名 package02
 
 1つのリポジトリには 1個のモジュールしか入れられない
 他のモジュールを使いたい場合は go mod を使って /pkg とかにインストールするらしい
 パッケージは複数作って良い
 
+小文字で1単語(単数形)が推奨
+キャメルケースやスネークケースは使わない
+
+ファイル名 は 有名OSS や 標準パッケージ でスネークケースを使うことが多いらしい
+個人的には パッケージ名 もスネークケースになる気がするのだが...笑
+
+ディレクトリ名はケバブケースを使っているらしい
+
+
 ## 試しに外部モジュールを インストールしてみる
 [Gin の公式サイトの Quickstart](https://gin-gonic.com/docs/quickstart/)
 `$ go get -u github.com/gin-gonic/gin`
 
+## 疑問
 go.mod にどういう意味で記述されたのか?
 go.sum の意味は?
 どこに インストールされたのか?
@@ -48,3 +58,16 @@ go.sum の意味は?
 イメージを作り直さないと up -d するたびに go get される
 
 test コードを書くときはどういうディレクトリ構成にすればいいのか
+
+### import の書き方
+import のときに ドットを使って path を書くと 使うときにクラス名を省略して書ける
+```go
+import (
+  . "fmt"
+)
+func main() {
+  Println("hello")
+}
+```
+
+使ってない パッケージ を import に書くと build で怒られるが アンダースコア を使うと怒られなくなる

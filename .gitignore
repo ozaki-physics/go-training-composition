@@ -1,3 +1,4 @@
+# 以下は github で ignore ファイルを go 言語で作ったら default で生成されたもの
 # Binaries for programs and plugins
 *.exe
 *.exe~

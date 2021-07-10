@@ -1,0 +1,14 @@
+version: '3'
+services:
+  go_training:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: go1.15:training_composition
+    container_name: go_training
+    tty: true
+    volumes:
+      - .:/go/src/github.com/ozaki-physics/go-training-composition
+      # コンテナ側は相対パス書けない
+    ports:
+      - "127.0.0.1:8080:8080"

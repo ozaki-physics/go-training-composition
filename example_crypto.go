@@ -12,6 +12,29 @@ import (
 
 // init 関数は main 関数の前に実行される初期化関数
 func init() {
+	initTimeZone()
+	initLog()
+}
+
+// log の初期設定
+func initLog() {
+	// ログに接頭辞を付けられる
+	log.SetPrefix("[暗号化の実験]")
+	// エラーの行数をつける 呼び出し元か
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+}
+
+func errCheck(err error) {
+	if err != nil {
+		// 第1引数が 1だと 実際にエラーの位置
+		// 第1引数が 2だと 呼び出し元の位置
+		log.Output(2, "エラー発生元")
+		log.Fatal(err)
+	}
+}
+
+// タイムゾーンの初期設定
+func initTimeZone() {
 	// タイムゾーンの変更
 	const location = "Asia/Tokyo"
 	loc, err := time.LoadLocation(location)
@@ -19,8 +42,12 @@ func init() {
 		loc = time.FixedZone(location, 9*60*60)
 	}
 	time.Local = loc
+}
 
-	log.SetPrefix("[暗号化の実験]")
+// 型確認
+func typeCheck(example interface{}) {
+	log.Output(2, "型の確認元")
+	log.Printf("%T\n", example)
 }
 
 func main() {
@@ -29,14 +56,6 @@ func main() {
 	// example02()
 	// example03()
 	// log.Println("main 終了")
-	// 型確認
-	// log.Printf("%T\n", "string")
-}
-
-func errCheck(err error) {
-	if err != nil {
-		log.Fatal("エラー発生", err)
-	}
 }
 
 func example01() {
@@ -45,10 +64,7 @@ func example01() {
 	key := []byte("passw0rdpassw0rdpassw0rdpassw0rd")
 
 	block, err := aes.NewCipher(key)
-	if err != nil {
-		fmt.Printf("err: %s\n", err)
-		return
-	}
+	errCheck(err)
 
 	// Encrypt
 	cipherText := make([]byte, len(plainText))
@@ -70,16 +86,13 @@ func example02() {
 	// IV は暗号文の先頭に入れておくことが多い
 	iv := encrypted[:aes.BlockSize]
 	// IV としてランダムなビット列を生成する
-	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		log.Fatal(err)
-	}
+	_, err := io.ReadFull(rand.Reader, iv)
+	errCheck(err)
 
 	// ブロック暗号として AES を使う場合
 	key := []byte("secret-key-12345")
 	block, err := aes.NewCipher(key)
-	if err != nil {
-		log.Fatal(err)
-	}
+	errCheck(err)
 
 	// CBC モードで暗号化する
 	mode := cipher.NewCBCEncrypter(block, iv)
@@ -101,9 +114,7 @@ func example03() {
 	key := []byte("aes-secret-key-1")
 	// cipher.Block を実装している AES 暗号化オブジェクトを生成する
 	c, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err)
-	}
+	errCheck(err)
 
 	// 暗号化される平文の長さは 16 バイト (128 ビット)
 	plainText := []byte("secret plain txt")

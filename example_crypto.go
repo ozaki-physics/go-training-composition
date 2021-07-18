@@ -61,20 +61,25 @@ func main() {
 func example01() {
 	plainText := []byte("This is 16 bytes")
 
+	// 鍵の長さは 16, 24, 32 バイトのどれかにしないとエラー
+	// これは32バイト(アルファベット1個が1バイトだから)
 	key := []byte("passw0rdpassw0rdpassw0rdpassw0rd")
 
+	// cipher.Block を実装している AES 暗号化オブジェクトを生成する
 	block, err := aes.NewCipher(key)
 	errCheck(err)
 
-	// Encrypt
+	// AES で暗号化
 	cipherText := make([]byte, len(plainText))
 	block.Encrypt(cipherText, plainText)
-	fmt.Printf("Cipher text: %x\n", cipherText)
+	// 16進数で出力 結果は暗号化されている
+	fmt.Printf("暗号文(16進数): %x\n", cipherText)
 
-	// Decrypt
+	// 復号する
 	decryptedText := make([]byte, len(cipherText))
 	block.Decrypt(decryptedText, cipherText)
-	fmt.Printf("Decrypted text: %s\n", string(decryptedText))
+	// 結果は元の平文が得られる
+	fmt.Printf("復号文(string): %s\n", string(decryptedText))
 }
 
 func example02() {
@@ -85,7 +90,7 @@ func example02() {
 
 	// IV は暗号文の先頭に入れておくことが多い
 	iv := encrypted[:aes.BlockSize]
-	// IV としてランダムなビット列を生成する
+	// iv がランダムなビット列になる
 	_, err := io.ReadFull(rand.Reader, iv)
 	errCheck(err)
 
@@ -95,43 +100,42 @@ func example02() {
 	errCheck(err)
 
 	// CBC モードで暗号化する
-	mode := cipher.NewCBCEncrypter(block, iv)
-	mode.CryptBlocks(encrypted[aes.BlockSize:], plainText)
+	mode01 := cipher.NewCBCEncrypter(block, iv)
+	mode01.CryptBlocks(encrypted[aes.BlockSize:], plainText)
 	fmt.Printf("encrypted: %x\n", encrypted)
 
 	// 復号するには復号化用オブジェクトが別に必要
-	mode = cipher.NewCBCDecrypter(block, iv)
+	mode02 := cipher.NewCBCDecrypter(block, iv)
 	decrypted := make([]byte, len(plainText))
 	// 先頭の IV を除いた部分を復号する
-	mode.CryptBlocks(decrypted, encrypted[aes.BlockSize:])
+	mode02.CryptBlocks(decrypted, encrypted[aes.BlockSize:])
 	fmt.Printf("decrypted: %s\n", decrypted)
-	// Output:
-	// decrypted: secret text 9999
+	// Output: decrypted: secret text 9999
 }
 
 func example03() {
-	// 鍵の長さは 16, 24, 32 バイトのどれかにしないとエラー
-	key := []byte("aes-secret-key-1")
-	// cipher.Block を実装している AES 暗号化オブジェクトを生成する
-	c, err := aes.NewCipher(key)
-	errCheck(err)
+	plainText := []byte("Bob loves Alice. But Alice hate Bob...")
 
-	// 暗号化される平文の長さは 16 バイト (128 ビット)
-	plainText := []byte("secret plain txt")
-	// 暗号化されたバイト列を格納するスライスを用意する
-	encrypted := make([]byte, aes.BlockSize)
-	// AES で暗号化をおこなう
-	c.Encrypt(encrypted, plainText)
-	// 結果は暗号化されている
-	fmt.Println(string(encrypted))
-	// Output:
-	// #^ϗ~:f9��˱�1�
+	key := []byte("passw0rdpassw0rdpassw0rdpassw0rd")
 
-	// 復号する
-	decrypted := make([]byte, aes.BlockSize)
-	c.Decrypt(decrypted, encrypted)
-	// 結果は元の平文が得られる
-	fmt.Println(string(decrypted))
-	// Output:
-	// secret plain txt
+	// Create new AES cipher block
+	block, err01 := aes.NewCipher(key)
+	errCheck(err01)
+
+	// Create IV
+	cipherText := make([]byte, aes.BlockSize+len(plainText))
+	iv := cipherText[:aes.BlockSize]
+	_, err02 := io.ReadFull(rand.Reader, iv)
+	errCheck(err02)
+
+	// Encrypt
+	encryptStream := cipher.NewCTR(block, iv)
+	encryptStream.XORKeyStream(cipherText[aes.BlockSize:], plainText)
+	fmt.Printf("Cipher text: %x \n", cipherText)
+
+	// Decrpt
+	decryptedText := make([]byte, len(cipherText[aes.BlockSize:]))
+	decryptStream := cipher.NewCTR(block, cipherText[:aes.BlockSize])
+	decryptStream.XORKeyStream(decryptedText, cipherText[aes.BlockSize:])
+	fmt.Printf("Decrypted text: %s\n", string(decryptedText))
 }

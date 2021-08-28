@@ -127,6 +127,11 @@ encoding/json パッケージには 色々なファイルがあるが encode.go 
 // 
 // 次のやつはリンク
 // https://golang.org/
+// 
+// BUG(who): 保存機能は未実装です
+// Deprecated: 非推奨を表す
+// See 説明文: https://xxx
+// TODO(who): 実装する
 package sample
 ```
 

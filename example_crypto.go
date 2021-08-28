@@ -51,91 +51,122 @@ func typeCheck(example interface{}) {
 }
 
 func main() {
-	// log.Println("main 開始")
+	log.Println("main 開始")
 	// example01()
 	// example02()
-	// example03()
-	// log.Println("main 終了")
+	example03()
+	log.Println("main 終了")
 }
 
+// 共通鍵暗号方式
+// ブロック暗号化方式の AES
+// 16byteの固定視長の平文しか暗号化できず使えない
+// See Go言語と暗号技術(AESからTLS): https://deeeet.com/writing/2015/11/10/go-crypto/
 func example01() {
+	// 平文の用意
 	plainText := []byte("This is 16 bytes")
 
+	// 鍵の用意
 	// 鍵の長さは 16, 24, 32 バイトのどれかにしないとエラー
 	// これは32バイト(アルファベット1個が1バイトだから)
 	key := []byte("passw0rdpassw0rdpassw0rdpassw0rd")
-
 	// cipher.Block を実装している AES 暗号化オブジェクトを生成する
 	block, err := aes.NewCipher(key)
 	errCheck(err)
 
-	// AES で暗号化
+	// 暗号文を入れる変数の用意
 	cipherText := make([]byte, len(plainText))
+	// AES で暗号化
 	block.Encrypt(cipherText, plainText)
 	// 16進数で出力 結果は暗号化されている
 	fmt.Printf("暗号文(16進数): %x\n", cipherText)
 
-	// 復号する
+	// 復号文を入れる変数の用意
 	decryptedText := make([]byte, len(cipherText))
+	// 復号する
 	block.Decrypt(decryptedText, cipherText)
 	// 結果は元の平文が得られる
 	fmt.Printf("復号文(string): %s\n", string(decryptedText))
 }
 
+// 共通鍵暗号方式
+// ブロック暗号化方式の AES
+// CBC モード
+// See Go 言語で学ぶ『暗号技術入門』Part 3 -CBC Mode-: https://skatsuta.github.io/2016/03/06/hyuki-crypt-book-go-3/
 func example02() {
-	// 平文。長さが 16 バイトの整数倍でない場合はパディングする必要がある
+	// 平文の用意 長さが 16 バイトの整数倍でない場合はパディングする必要がある
 	plainText := []byte("secret text 9999")
-	// 暗号化データ。先頭に初期化ベクトル (IV) を入れるため、1ブロック分余計に確保する
-	encrypted := make([]byte, aes.BlockSize+len(plainText))
 
-	// IV は暗号文の先頭に入れておくことが多い
-	iv := encrypted[:aes.BlockSize]
-	// iv がランダムなビット列になる
-	_, err := io.ReadFull(rand.Reader, iv)
-	errCheck(err)
-
-	// ブロック暗号として AES を使う場合
+	// 鍵の用意
 	key := []byte("secret-key-12345")
-	block, err := aes.NewCipher(key)
-	errCheck(err)
-
-	// CBC モードで暗号化する
-	mode01 := cipher.NewCBCEncrypter(block, iv)
-	mode01.CryptBlocks(encrypted[aes.BlockSize:], plainText)
-	fmt.Printf("encrypted: %x\n", encrypted)
-
-	// 復号するには復号化用オブジェクトが別に必要
-	mode02 := cipher.NewCBCDecrypter(block, iv)
-	decrypted := make([]byte, len(plainText))
-	// 先頭の IV を除いた部分を復号する
-	mode02.CryptBlocks(decrypted, encrypted[aes.BlockSize:])
-	fmt.Printf("decrypted: %s\n", decrypted)
-	// Output: decrypted: secret text 9999
-}
-
-func example03() {
-	plainText := []byte("Bob loves Alice. But Alice hate Bob...")
-
-	key := []byte("passw0rdpassw0rdpassw0rdpassw0rd")
-
-	// Create new AES cipher block
+	// cipher.Block を実装している AES 暗号化オブジェクトを生成する
 	block, err01 := aes.NewCipher(key)
 	errCheck(err01)
 
-	// Create IV
+	// 暗号文を入れる変数の用意
+	// 先頭に初期化ベクトル (IV) を入れるため、1ブロック分余計に確保する
+	// CBC モードは1つ前の暗号ブロックを使って暗号化するから 一番最初はランダムで用意する
 	cipherText := make([]byte, aes.BlockSize+len(plainText))
+	// 暗号文の戦闘ブロック(IV)の参照を取り出す
 	iv := cipherText[:aes.BlockSize]
+	// iv がランダムなビット列する
 	_, err02 := io.ReadFull(rand.Reader, iv)
 	errCheck(err02)
 
-	// Encrypt
-	encryptStream := cipher.NewCTR(block, iv)
-	encryptStream.XORKeyStream(cipherText[aes.BlockSize:], plainText)
-	fmt.Printf("Cipher text: %x \n", cipherText)
+	// 暗号化用オブジェクトを用意
+	block01 := cipher.NewCBCEncrypter(block, iv)
+	// AES で暗号化 CBC モード
+	block01.CryptBlocks(cipherText[aes.BlockSize:], plainText)
+	// 16進数で出力 結果は暗号化されている
+	fmt.Printf("暗号文(16進数): %x\n", cipherText)
 
-	// Decrpt
-	decryptedText := make([]byte, len(cipherText[aes.BlockSize:]))
+	// 復号化用オブジェクトを用意
+	block02 := cipher.NewCBCDecrypter(block, iv)
+	// 復号文を入れる変数の用意
+	decryptedText := make([]byte, len(plainText))
+	// 復号する 先頭の IV を除いた部分だけ
+	block02.CryptBlocks(decryptedText, cipherText[aes.BlockSize:])
+	// 結果は元の平文が得られる
+	fmt.Printf("復号文(string): %s\n", decryptedText)
+}
+
+// 共通鍵暗号方式
+// ブロック暗号化方式の AES
+// CTR モード
+// だから ストリーム暗号とみなせる
+// See Go言語と暗号技術(AESからTLS): https://deeeet.com/writing/2015/11/10/go-crypto/
+func example03() {
+	// 平文の用意
+	plainText := []byte("Bob loves Alice. But Alice hate Bob...")
+
+	// 鍵の用意
+	key := []byte("passw0rdpassw0rdpassw0rdpassw0rd")
+	// cipher.Block を実装している AES 暗号化オブジェクトを生成する
+	block, err01 := aes.NewCipher(key)
+	errCheck(err01)
+
+	// 暗号文を入れる変数の用意
+	cipherText := make([]byte, aes.BlockSize+len(plainText))
+	// 暗号文の戦闘ブロック(IV)の参照を取り出す
+	iv := cipherText[:aes.BlockSize]
+	// iv がランダムなビット列する
+	_, err02 := io.ReadFull(rand.Reader, iv)
+	errCheck(err02)
+
+	// 暗号化用オブジェクトを用意
+	encryptStream := cipher.NewCTR(block, iv)
+	// AES で暗号化 CTR モード
+	encryptStream.XORKeyStream(cipherText[aes.BlockSize:], plainText)
+	// 16進数で出力 結果は暗号化されている
+	fmt.Printf("暗号文(16進数): %x \n", cipherText)
+
+	// 復号化用オブジェクトを用意
+	// ユニークな必要はあるが 安全な必要はないので 暗号文の先頭に差し込んである
 	decryptStream := cipher.NewCTR(block, cipherText[:aes.BlockSize])
+	// 復号文を入れる変数の用意
+	decryptedText := make([]byte, len(cipherText[aes.BlockSize:]))
+	// 復号する 先頭の IV を除いた部分だけ
 	decryptStream.XORKeyStream(decryptedText, cipherText[aes.BlockSize:])
-	fmt.Printf("Decrypted text: %s\n", string(decryptedText))
+	// 結果は元の平文が得られる
+	fmt.Printf("復号文(string): %s\n", string(decryptedText))
 }

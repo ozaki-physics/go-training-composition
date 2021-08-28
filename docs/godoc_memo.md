@@ -136,7 +136,7 @@ package sample
 ```
 
 他にも Example を書くための それ用のメソッドを作って `// Output` って書くと `go test` でテストが実行できるらしい
-また今後元気があるときに調べよう
+__また今後 元気があるときに調べよう__
 
 ## 公式も `godoc` ツールを使っているみたい
 公式ドキュメントのブログ[Godoc: documenting Go code](https://go.dev/blog/godoc)で

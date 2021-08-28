@@ -10,12 +10,12 @@ Javadoc のように ソースファイルに ドキュメントを書きつつ 
 `go doc` サブコマンドは CLI しか対応してない
 `godoc` ツールは Web サーバ立てるこもできる
 
+__僕は godoc のコマンドがうまく実行できないけど 公式が godoc ツール使ってるから godoc の書き方をする__
+
 go の公式っぽいサイト
 - [トップページ01](https://golang.org/)
 - [トップページ02](https://go.dev/)
-
 どちららも[Packages ドキュメント](https://pkg.go.dev/std)に繋がる
-そして [Packages ドキュメント](https://pkg.go.dev) は `godoc` ツールを使ってそう
 
 ## `go doc` サブコマンド の使い方
 ### 前提
@@ -104,10 +104,69 @@ encoding/json パッケージには 色々なファイルがあるが encode.go 
 
 ドキュメントの書き方
 `// ドキュメント` を使って書くことが多いらしい
-また ドキュメントその要素名で
-[Packages ドキュメント](https://pkg.go.dev) の UI が `godoc` ツール と似ている
-かつ 標準 package を見ると `// ドキュメント` を多用してるし `doc.go` ファイルもあるから `godoc` ツールを使ってそう?
 
-他の参考文献
-[GoDocドキュメントの書き方](https://blog.lufia.org/entry/2018/05/14/150400)
-[go doc の使い方・コメントを書いて、ちゃんと読む](https://qiita.com/ayasuda/items/53933c83d0fb7152c7e9)
+ドキュメントのルール
+- 連続した行は一つの段落になる
+- 段落を区切りたい場合は空白行を間に入れる必要がある
+- 英大文字で始まり、直前が句読点ではない単一行の段落は見出し
+- 字下げすると整形済みテキスト
+- URL はリンク
+
+```go
+// ここはパッケージコメントの最初になるから見出しではない
+// 
+// Aなど 英大文字で始まり単一行かつ句読点なしかつ前が見出しではないのでこれは見出し
+// 
+// 段落の開始
+// 内容
+// 段落の終了
+// 
+// 次の段落の開始
+// 内容
+// 次の段落の終了
+// 
+//     整形済みテキスt
+// 
+// 次のやつはリンク
+// https://golang.org/
+package sample
+```
+
+他にも Example を書くための それ用のメソッドを作って `// Output` って書くと `go test` でテストが実行できるらしい
+また今後元気があるときに調べよう
+
+## 公式も `godoc` ツールを使っているみたい
+公式ドキュメントのブログ[Godoc: documenting Go code](https://go.dev/blog/godoc)で
+>we have developed the godoc documentation tool.
+`godoc` ツールを開発したって言ってるから 公式ツールっぽい
+
+>Godoc is conceptually related to Python’s Docstring and Java’s Javadoc but its design is simpler.
+GodocはPythonのDocstringやJavaのJavadocと概念的には似ていますが、デザインはよりシンプルです。
+>The comments read by godoc are not language constructs (as with Docstring) nor must they have their own machine-readable syntax (as with Javadoc).
+Godocで読まれるコメントは、Docstringのような言語構造ではなく、Javadocのような機械で読める独自の構文を持つ必要もありません。
+>Godoc comments are just good comments, the sort you would want to read even if godoc didn’t exist.
+Godocのコメントは、たとえgodocが存在しなくても読みたくなるような、優れたコメントなのです。
+
+つまり Javadoc でいう @Param とか @return みたいなドキュメントの書き方は無いかも
+機能としてあるのは 
+`// BUG(who): 保存機能は未実装です`
+`// Deprecated: 非推奨を表す`
+>The “who” part should be the user name of someone who could provide more information.
+who の部分には、より多くの情報を提供できる人のユーザー名を入力してください。
+面倒だから毎回 who って書いてもいいかな?w 一応 ozaki って書いとくべき?
+
+慣例として
+`// See 説明文: https://xxx`
+
+また[GoDocドキュメントの書き方](https://blog.lufia.org/entry/2018/05/14/150400)によると
+拡張することで
+`// TODO(who): 実装する`
+など作れるらしい
+
+`go doc` サブコマンドの[go/doc の Documentation](https://pkg.go.dev/go/doc)で
+Javadocのような機械で読める独自の構文がないか調べたけど よく分からなかった
+逆に `func ToHTML(w io.Writer, text string, words map[string]string)` があって html 作れるのか? って思った
+どうやら `godoc` ツールで `ToHTML()` を使っているらしい
+
+## 他の参考文献
+[go doc の使い方・コメントを書いて、ちゃんと読む](https://ayasuda.github.io/pages/introduction_go_doc.html)

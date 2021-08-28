@@ -3,6 +3,9 @@ go:1.15 には /go ディレクトリの下に /bin /src の2個がある
 /go の直下に /pkg は見当たらない
 
 go.mod はどの path に作るのがいいのか?
+
+`go env`で go で使うような path が全部確認できる
+
 ### 記事を読んで
 パッケージを公開することを考えて src/github.com/ozaki-physics/go-training-chat にするらしい
 github の リポジトリ作ると /github.com/ozaki-physics/リポジトリ名 になる

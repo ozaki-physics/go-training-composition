@@ -19,8 +19,6 @@ go の公式っぽいサイト
 
 ## `go doc` サブコマンド の使い方
 ### 前提
-`$ go version`
-go version go1.15.6 linux/amd64
 `$ pwd`
 /go/src/github.com/ozaki-physics/go-training-composition
 `$ go help doc`

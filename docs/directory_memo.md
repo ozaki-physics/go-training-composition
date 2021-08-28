@@ -53,6 +53,14 @@ docker 内の`/go/src/github.com/ozaki-physics/go-training-composition`にマウ
 [Gin の公式サイトの Quickstart](https://gin-gonic.com/docs/quickstart/)
 `$ go get -u github.com/gin-gonic/gin`
 
+[Go1.16からの go get と go install について](https://qiita.com/eihigh/items/9fe52804610a8c4b7e41)
+go 1.16 からは go install と go get の役割が整理されていくらしい
+バイナリのビルドとインストールのための go install
+go.mod 編集のための go get
+
+`go mod tidy` で、使われていない依存モジュールを削除できるから
+1.15 -> 1.17 に移行した
+
 ## 疑問
 go.mod にどういう意味で記述されたのか?
 go.sum の意味は?

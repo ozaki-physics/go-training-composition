@@ -6,6 +6,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/hmac"
+	"crypto/md5"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha512"
@@ -79,7 +80,9 @@ func main() {
 	// 証明書(x509) 自己署名証明書を作ってみる
 	// example08()
 	// TLS
-	example09()
+	// example09()
+	// パスワード
+	example10()
 	log.Println("main 終了")
 }
 
@@ -336,4 +339,32 @@ func example08() {
 // See Go言語と暗号技術(AESからTLS): https://deeeet.com/writing/2015/11/10/go-crypto/
 func example09() {
 	fmt.Println("また今後 元気があるときに調べたい")
+}
+
+// パスワード
+// salt という 複数回ハッシュ化する かつ rainbow table 対策
+// See パスワードの保存: https://astaxie.gitbooks.io/build-web-application-with-golang/content/ja/09.5.html
+func example10() {
+	hash := md5.New()
+	// func WriteString(w Writer, s string) (n int, err error)
+	// w に s を加える
+	io.WriteString(hash, "暗号化が必要なパスワード")
+
+	check01md5 := hash.Sum(nil)
+	fmt.Printf("ハッシュ(16進数): %x\n", check01md5)
+
+	// salt を2つ指定
+	salt1 := "@#$%"
+	userName := "ユーザー名"
+	salt2 := "^&*()"
+	check01md5string := string(check01md5)
+
+	// salt1 + ユーザ名 + salt2 + MD5 を連結
+	io.WriteString(hash, salt1)
+	io.WriteString(hash, userName)
+	io.WriteString(hash, salt2)
+	io.WriteString(hash, check01md5string)
+
+	check02md5 := hash.Sum(nil)
+	fmt.Printf("ハッシュ(16進数): %x\n", check02md5)
 }

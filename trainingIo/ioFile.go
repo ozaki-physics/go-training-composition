@@ -106,6 +106,8 @@ func searchFile(fileName string) {
 
 // openFile ファイルを開く
 // 読み込み専用　ファイルがなければエラー
+// See: https://pkg.go.dev/os@go1.17#Open
+// 内部的には os.File.OpenFile(name, O_RDONLY, 0) だけ
 // 必ず閉じること
 // See ファイルが存在するか判定: https://pkg.go.dev/errors@go1.17#Is
 func openFile(fileName string) {
@@ -152,7 +154,7 @@ func openFile02(fileName string) {
 // createFile ファイルを作成する
 // ファイルがなければ作られる
 // ファイルがあれば開く
-// 内部的には OpenFile(name, O_RDWR|O_CREATE|O_TRUNC, 0666) だけ
+// 内部的には os.File.OpenFile(name, O_RDWR|O_CREATE|O_TRUNC, 0666) だけ
 // See 何も処理してない: https://github.com/golang/go/blob/master/src/os/file.go
 func createFile(fileName string) {
 	f, err := os.Create(fileName)
@@ -184,7 +186,7 @@ func allDataReadFile(fileName string) {
 // ただ ファイルのオブジェクトを引数に渡す
 // 内部では io.ReadAll(r) を呼んでるだけ
 // See: https://github.com/golang/go/blob/master/src/io/ioutil/ioutil.go
-// 引数が io.Reader なのに 自作メソッドは *os.File を渡しても動く理由が分からない
+// 引数 r が io.Reader なのに 自作メソッドは *os.File を渡しても動く理由が分からない
 // なぜなら *os.File は struct で io.Reader は interface だから
 // io.Reader メソッドを持っている *os.File は引数で渡せる
 // See: https://pkg.go.dev/io/ioutil@go1.17#ReadAll

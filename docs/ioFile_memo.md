@@ -90,7 +90,58 @@ Text() で一行ずつ取得できる
 >一括で読み書きするなら ioutil パッケージ
 
 
+## 感想
+*os.File をよく使うイメージ
+1行ずつ扱うなら bufio かな
 
+## 整理する
+主に使ったパッケージ: bufio, io, os
+特に os.File を圧倒的に使った
+他にも
+bufio.NewScanner
+bufio.NewReader
+bufio.NewWriter
+
+os.File は struct
+io.Reader は interface
+os.File は io.Reader を持っているらしい
+
+Fprint(w io.Writer, a ...interface{}) で 第1引数に os.File だったり bufio.Writer を渡してる
+つまり os.File も bufio.Writer も io.Writer interface を持っている
+io.Writer に Write() や WriteString() が定義されてるのかな
+
+- 読み込み
+  -　一気に
+  `ioutil.ReadFile(string)` 実体は os.ReadFile(string)
+  `ioutil.ReadAll(os.File)` 実体は io.ReadAll(io.Reader)
+  - バイトずつ
+  `os.File.Read([]byte)`
+  - 1行ずつ
+  `bufio.NewScanner(os.File).Scan()`
+  `bufio.NewScanner(os.File).ReadString(byte)`
+  `bufio.NewScanner(os.File).ReadLine()`
+- 書き込み
+  - os.File 系
+  `os.File.WriteString(string)`
+  `os.File.Write([]byte)`
+  `fmt.Fprintln(os.File, interface{})`
+  - bufio.Writer 系
+  `bufio.Writer.WriteString(string)`
+  `bufio.Writer.Write([]byte)`
+  `fmt.Fprintln(bufio.Writer, interface{})`
+  - 一気に
+  `ioutil.WriteFile(string, []byte, fs.FileMode)` 実体は os.WriteFile(string, []byte, fs.FileMode)
+- ファイルやディレクトリを探す
+`os.Stat(string)`
+- ファイルを開く
+`os.Open(string)` 実体は os.File.OpenFile(name, O_RDONLY, 0)
+`os.OpenFile(string, os.O_RDWR|os.O_CREATE, fs.FileMode)` 基本使わないで Open, Create を使う
+- ファイルを作成する
+`os.Create(strubg)` 実体は os.File.OpenFile(string, O_RDWR|O_CREATE|O_TRUNC, fs.FileMode)
+- ファイルのコピー
+`io.Copy(os.Create(string), os.Open(string))`
+- ファイル名の変更
+`os.Rename(oldPath, newPath string)`
 
 
 

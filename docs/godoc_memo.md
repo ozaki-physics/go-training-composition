@@ -173,3 +173,6 @@ Javadocのような機械で読める独自の構文がないか調べたけど 
 
 ## 他の参考文献
 [go doc の使い方・コメントを書いて、ちゃんと読む](https://ayasuda.github.io/pages/introduction_go_doc.html)
+
+go doc はメソッドのアルファベット順, type のアルファベット順と出力してく
+別にファイル内で メソッドをアルファベット順に定義するとかしてない

@@ -87,3 +87,5 @@ func main() {
 [GitHubリポジトリ作成時の定形作業をTemplate Repositoryで省力化する](https://devblog.thebase.in/entry/2020/06/23/131444)
 を見てると 自分のディレクトリ構成が合っているか不安になってくる
 特に docker の中で /go/src/github.com/ozaki-physics/go-training-composition がカレントディレクトリになるのが気になる
+
+`go fmt ./...` パッケージ全部に対して fmt をする

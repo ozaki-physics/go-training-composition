@@ -1,4 +1,4 @@
-package main
+package trainingCrypto
 
 import (
 	"crypto/aes"
@@ -14,83 +14,18 @@ import (
 	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
+	"github.com/ozaki-physics/go-training-composition/utils"
 	"io"
-	"log"
 	"math/big"
 	"os"
 	"time"
 )
 
-// init 関数は main 関数の前に実行される初期化関数
-func init() {
-	initTimeZone()
-	initLog()
-}
-
-// log の初期設定
-func initLog() {
-	// ログに接頭辞を付けられる
-	log.SetPrefix("[暗号化の実験]")
-	// エラーの行数をつける 呼び出し元か
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-}
-
-func errCheck(err error) {
-	if err != nil {
-		// 第1引数が 1だと 実際にエラーの位置
-		// 第1引数が 2だと 呼び出し元の位置
-		log.Output(2, "エラー発生元")
-		log.Fatal(err)
-	}
-}
-
-// タイムゾーンの初期設定
-func initTimeZone() {
-	// タイムゾーンの変更
-	const location = "Asia/Tokyo"
-	loc, err := time.LoadLocation(location)
-	if err != nil {
-		loc = time.FixedZone(location, 9*60*60)
-	}
-	time.Local = loc
-}
-
-// 型確認
-func typeCheck(example interface{}) {
-	log.Output(2, "型の確認元")
-	log.Printf("%T\n", example)
-}
-
-func main() {
-	log.Println("main 開始")
-	// 共通鍵暗号方式 ブロック暗号化方式の AES
-	// example01()
-	// 共通鍵暗号方式 ブロック暗号化方式の AES CBC モード
-	// example02()
-	// 共通鍵暗号方式 ブロック暗号化方式の AES CTR モード だから ストリーム暗号とみなせる
-	// example03()
-	// 公開鍵暗号方式 RSA-PKCS1v15 で暗号化
-	// example04()
-	// ハッシュ SHA-2 の SHA-512
-	// example05()
-	// メッセージ認証コード(MAC) 否認ができず 送信者の証明ができない
-	// example06()
-	// デジタル署名 公開鍵暗号の応用なため 今回は 楕円曲線暗号 を使う
-	// example07()
-	// 証明書(x509) 自己署名証明書を作ってみる
-	// example08()
-	// TLS
-	// example09()
-	// パスワード
-	example10()
-	log.Println("main 終了")
-}
-
 // 共通鍵暗号方式
 // ブロック暗号化方式の AES
 // 16byteの固定視長の平文しか暗号化できず使えない
 // See Go言語と暗号技術(AESからTLS): https://deeeet.com/writing/2015/11/10/go-crypto/
-func example01() {
+func Example01() {
 	// 平文の用意
 	plainText := []byte("This is 16 bytes")
 
@@ -100,7 +35,7 @@ func example01() {
 	key := []byte("passw0rdpassw0rdpassw0rdpassw0rd")
 	// cipher.Block を実装している AES 暗号化オブジェクトを生成する
 	block, err := aes.NewCipher(key)
-	errCheck(err)
+	utils.ErrCheck(err)
 
 	// 暗号文を入れる変数の用意
 	cipherText := make([]byte, len(plainText))
@@ -121,7 +56,7 @@ func example01() {
 // ブロック暗号化方式の AES
 // CBC モード
 // See Go 言語で学ぶ『暗号技術入門』Part 3 -CBC Mode-: https://skatsuta.github.io/2016/03/06/hyuki-crypt-book-go-3/
-func example02() {
+func Example02() {
 	// 平文の用意 長さが 16 バイトの整数倍でない場合はパディングする必要がある
 	plainText := []byte("secret text 9999")
 
@@ -129,7 +64,7 @@ func example02() {
 	key := []byte("secret-key-12345")
 	// cipher.Block を実装している AES 暗号化オブジェクトを生成する
 	block, err01 := aes.NewCipher(key)
-	errCheck(err01)
+	utils.ErrCheck(err01)
 
 	// 暗号文を入れる変数の用意
 	// 先頭に初期化ベクトル (IV) を入れるため、1ブロック分余計に確保する
@@ -139,7 +74,7 @@ func example02() {
 	iv := cipherText[:aes.BlockSize]
 	// iv がランダムなビット列する
 	_, err02 := io.ReadFull(rand.Reader, iv)
-	errCheck(err02)
+	utils.ErrCheck(err02)
 
 	// 暗号化用オブジェクトを用意
 	block01 := cipher.NewCBCEncrypter(block, iv)
@@ -163,7 +98,7 @@ func example02() {
 // CTR モード
 // だから ストリーム暗号とみなせる
 // See Go言語と暗号技術(AESからTLS): https://deeeet.com/writing/2015/11/10/go-crypto/
-func example03() {
+func Example03() {
 	// 平文の用意
 	plainText := []byte("Bob loves Alice. But Alice hate Bob...")
 
@@ -171,7 +106,7 @@ func example03() {
 	key := []byte("passw0rdpassw0rdpassw0rdpassw0rd")
 	// cipher.Block を実装している AES 暗号化オブジェクトを生成する
 	block, err01 := aes.NewCipher(key)
-	errCheck(err01)
+	utils.ErrCheck(err01)
 
 	// 暗号文を入れる変数の用意
 	cipherText := make([]byte, aes.BlockSize+len(plainText))
@@ -179,7 +114,7 @@ func example03() {
 	iv := cipherText[:aes.BlockSize]
 	// iv がランダムなビット列する
 	_, err02 := io.ReadFull(rand.Reader, iv)
-	errCheck(err02)
+	utils.ErrCheck(err02)
 
 	// 暗号化用オブジェクトを用意
 	encryptStream := cipher.NewCTR(block, iv)
@@ -202,7 +137,7 @@ func example03() {
 // 公開鍵暗号方式
 // RSA-PKCS1v15 で暗号化
 // See Go言語と暗号技術(AESからTLS): https://deeeet.com/writing/2015/11/10/go-crypto/
-func example04() {
+func Example04() {
 	// 平文の用意
 	plainText := []byte("Bob loves Alice.")
 
@@ -212,19 +147,19 @@ func example04() {
 
 	// 秘密鍵と公開鍵を生成
 	privateKey, err := rsa.GenerateKey(rand.Reader, keySize)
-	errCheck(err)
+	utils.ErrCheck(err)
 	// 公開鍵を取得 privateKey 構造体の中に 秘密鍵と対応した公開鍵がある
 	publicKey := &privateKey.PublicKey
 
 	// 暗号化
 	cipherText, err := rsa.EncryptPKCS1v15(rand.Reader, publicKey, plainText)
-	errCheck(err)
+	utils.ErrCheck(err)
 	// 16進数で出力 結果は暗号化されている
 	fmt.Printf("暗号文(16進数): %x\n", cipherText)
 
 	// 復号する
 	decryptedText, err := rsa.DecryptPKCS1v15(rand.Reader, privateKey, cipherText)
-	errCheck(err)
+	utils.ErrCheck(err)
 	// 結果は元の平文が得られる
 	fmt.Printf("復号文(string): %s\n", decryptedText)
 }
@@ -232,7 +167,7 @@ func example04() {
 // ハッシュ
 // SHA-2 の SHA-512
 // See Go言語と暗号技術(AESからTLS): https://deeeet.com/writing/2015/11/10/go-crypto/
-func example05() {
+func Example05() {
 	msg := []byte("foo")
 	checksum512 := sha512.Sum512(msg)
 	fmt.Println(checksum512)
@@ -241,7 +176,7 @@ func example05() {
 // メッセージ認証コード(MAC)
 // 否認ができず 送信者の証明ができない
 // See Go言語と暗号技術(AESからTLS): https://deeeet.com/writing/2015/11/10/go-crypto/
-func example06() {
+func Example06() {
 	msg := []byte("Bob loves Alice.")
 	key := []byte("passw0rd")
 
@@ -263,11 +198,11 @@ func example06() {
 // デジタル署名
 // 公開鍵暗号の応用なため 今回は 楕円曲線暗号 を使う
 // See Go言語と暗号技術(AESからTLS): https://deeeet.com/writing/2015/11/10/go-crypto/
-func example07() {
+func Example07() {
 	// 秘密鍵と公開鍵を生成
 	// 利用できる曲線は P-224, P-256, P-384, P-521
 	privateKey, err := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
-	errCheck(err)
+	utils.ErrCheck(err)
 	// 公開鍵を取得 privateKey 構造体の中に 秘密鍵と対応した公開鍵がある
 	publicKey := &privateKey.PublicKey
 
@@ -276,7 +211,7 @@ func example07() {
 	hash := []byte("This is message.")
 	// 署名する
 	r, s, err := ecdsa.Sign(rand.Reader, privateKey, hash)
-	errCheck(err)
+	utils.ErrCheck(err)
 
 	// r, s が何か分からない
 	fmt.Printf("r の値: %d\n", r)
@@ -295,10 +230,10 @@ func example07() {
 // 公開鍵暗号としては楕円曲線暗号を使い PEM形式でファイルに保存する(ca.pem)
 // 証明書の検証はしてない
 // See Go言語と暗号技術(AESからTLS): https://deeeet.com/writing/2015/11/10/go-crypto/
-func example08() {
+func Example08() {
 	// 秘密鍵と公開鍵を生成
 	privateKey, err01 := ecdsa.GenerateKey(elliptic.P521(), rand.Reader)
-	errCheck(err01)
+	utils.ErrCheck(err01)
 	// 公開鍵を取得 privateKey 構造体の中に 秘密鍵と対応した公開鍵がある
 	publicKey := &privateKey.PublicKey
 
@@ -321,10 +256,10 @@ func example08() {
 
 	// 証明書を作成
 	derBytes, err02 := x509.CreateCertificate(rand.Reader, &ca, &ca, publicKey, privateKey)
-	errCheck(err02)
+	utils.ErrCheck(err02)
 
-	certOut, err03 := os.Create("ca.pem")
-	errCheck(err03)
+	certOut, err03 := os.Create("trainingCrypto/ca.pem")
+	utils.ErrCheck(err03)
 
 	defer certOut.Close()
 
@@ -332,19 +267,19 @@ func example08() {
 		Type:  "CERTIFICATE",
 		Bytes: derBytes,
 	})
-	errCheck(err04)
+	utils.ErrCheck(err04)
 }
 
 // TLS
 // See Go言語と暗号技術(AESからTLS): https://deeeet.com/writing/2015/11/10/go-crypto/
-func example09() {
+func Example09() {
 	fmt.Println("また今後 元気があるときに調べたい")
 }
 
 // パスワード
 // salt という 複数回ハッシュ化する かつ rainbow table 対策
 // See パスワードの保存: https://astaxie.gitbooks.io/build-web-application-with-golang/content/ja/09.5.html
-func example10() {
+func Example10() {
 	hash := md5.New()
 	// func WriteString(w Writer, s string) (n int, err error)
 	// w に s を加える

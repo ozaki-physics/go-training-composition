@@ -1,4 +1,4 @@
-package main
+package trainingTimeZone
 
 import (
 	"fmt"
@@ -7,7 +7,8 @@ import (
 
 const location = "Asia/Tokyo"
 
-func main() {
+// MainTimeZone タイムゾーンの勉強
+func MainTimeZone() {
 	// タイムゾーンが存在するか確認
 	loc, err := time.LoadLocation(location)
 	// もし Asia/Tokyo が無ければ自分で設定する

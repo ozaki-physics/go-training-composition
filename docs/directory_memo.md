@@ -3,6 +3,9 @@ go:1.15 には /go ディレクトリの下に /bin /src の2個がある
 /go の直下に /pkg は見当たらない
 
 go.mod はどの path に作るのがいいのか?
+
+`go env`で go で使うような path が全部確認できる
+
 ### 記事を読んで
 パッケージを公開することを考えて src/github.com/ozaki-physics/go-training-chat にするらしい
 github の リポジトリ作ると /github.com/ozaki-physics/リポジトリ名 になる
@@ -50,6 +53,14 @@ docker 内の`/go/src/github.com/ozaki-physics/go-training-composition`にマウ
 [Gin の公式サイトの Quickstart](https://gin-gonic.com/docs/quickstart/)
 `$ go get -u github.com/gin-gonic/gin`
 
+[Go1.16からの go get と go install について](https://qiita.com/eihigh/items/9fe52804610a8c4b7e41)
+go 1.16 からは go install と go get の役割が整理されていくらしい
+バイナリのビルドとインストールのための go install
+go.mod 編集のための go get
+
+`go mod tidy` で、使われていない依存モジュールを削除できるから
+1.15 -> 1.17 に移行した
+
 ## 疑問
 go.mod にどういう意味で記述されたのか?
 go.sum の意味は?
@@ -71,3 +82,10 @@ func main() {
 ```
 
 使ってない パッケージ を import に書くと build で怒られるが アンダースコア を使うと怒られなくなる
+
+
+[GitHubリポジトリ作成時の定形作業をTemplate Repositoryで省力化する](https://devblog.thebase.in/entry/2020/06/23/131444)
+を見てると 自分のディレクトリ構成が合っているか不安になってくる
+特に docker の中で /go/src/github.com/ozaki-physics/go-training-composition がカレントディレクトリになるのが気になる
+
+`go fmt ./...` パッケージ全部に対して fmt をする

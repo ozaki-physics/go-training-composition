@@ -144,6 +144,25 @@ io.Writer に Write() や WriteString() が定義されてるのかな
 `os.Rename(oldPath, newPath string)`
 
 
+[[1分学習]Goで標準入力を受け付ける](https://zenn.dev/tomatomato/articles/onemin_golang_stdin)
+[Goで標準入力とファイル読み込みを可能にするインタフェース](https://medium.com/eureka-engineering/go-read-from-stdin-or-file-bb7a9197b904)
+[[Go] ファイルや標準入力から一行ずつ読み込む](https://qiita.com/hnakamur/items/a53b701c8827fe4bfec7)
+[Go言語(golang)のループ for, for..range, foreach, while](https://golang.hateblo.jp/entry/2019/10/07/171630)
+[Go 言語で標準入力から読み込む競技プログラミングのアレ --- 改訂第二版](https://qiita.com/tnoda_/items/b503a72eac82862d30c6)
+>簡単に書きたいとき
+>`fmt.Scan` を使う
+>たくさん (> 10^5) 読み込みたいとき
+>`bufio の Scanner` を使う
+>長い行を (> 64x10^3) 読み込みたいとき
+>`bufio の ReadLine` を使う
+
+[golang でコマンドライン引数を使う](https://qiita.com/nakaryooo/items/2d0befa2c1cf347800c3)
+>- os パッケージの Args を使う
+>- flag パッケージを使う
+>flag を使うのが良さそう
+>型指定やオプショナル引数、デフォルト値の設定等、色々できるから
+[Go言語 - os.Argsでコマンドラインパラメータを受け取る](https://blog.y-yuki.net/entry/2017/04/30/000000)
+
 
 よく使う暗号とか log とか ちゃんとパッケージ化しておいた方がいいかもな
 てか main に色々書くの良くなかった笑

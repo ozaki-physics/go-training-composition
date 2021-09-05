@@ -5,5 +5,6 @@ import (
 )
 
 func main() {
-	trainingIo.Training()
+	trainingIo.FileVersion()
+	trainingIo.TerminalVersion()
 }

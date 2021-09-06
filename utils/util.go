@@ -13,6 +13,16 @@ func InitLog(s string) {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 }
 
+// StartLog ただ最初に 開始 と出力するだけ
+func StartLog() {
+	log.Println("開始")
+}
+
+// EndLog ただ最後に 終了 と出力するだけ
+func EndLog() {
+	log.Println("終了")
+}
+
 // InitTimeZone タイムゾーンの初期設定
 func InitTimeZone() {
 	// タイムゾーンの変更

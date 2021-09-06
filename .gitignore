@@ -1,3 +1,12 @@
+fileCrypto/cipher/*
+!fileCrypto/cipher/cipherText.md
+fileCrypto/plain/*
+!fileCrypto/plain/plainText.md
+fileCrypto/decode/*
+!fileCrypto/decode/decodeText.md
+fileCrypto/key/*
+!fileCrypto/key/AES-CTR.key
+
 # 以下は github で ignore ファイルを go 言語で作ったら default で生成されたもの
 # Binaries for programs and plugins
 *.exe

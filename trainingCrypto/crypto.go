@@ -110,7 +110,7 @@ func Example03() {
 
 	// 暗号文を入れる変数の用意
 	cipherText := make([]byte, aes.BlockSize+len(plainText))
-	// 暗号文の戦闘ブロック(IV)の参照を取り出す
+	// 暗号文の先頭ブロック(IV)の参照を取り出す
 	iv := cipherText[:aes.BlockSize]
 	// iv がランダムなビット列する
 	_, err02 := io.ReadFull(rand.Reader, iv)

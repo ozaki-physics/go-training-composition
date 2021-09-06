@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/ozaki-physics/go-training-composition/fileCrypto"
 	"github.com/ozaki-physics/go-training-composition/package01"
 	"github.com/ozaki-physics/go-training-composition/package02"
 	"github.com/ozaki-physics/go-training-composition/trainingCrypto"
@@ -17,11 +18,13 @@ func init() {
 }
 
 func main() {
-	mainPkg()
+	// mainPkg()
 	// mainTimeZone()
 	// mainCrypto()
 	// ioFileVersion()
 	// ioTerminalVersion()
+	fileCrypto.RunFileEnCrypt()
+	fileCrypto.RunFileDeCrypt()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -81,7 +84,7 @@ func mainTimeZone() {
 // mainCrypto 暗号理論の勉強
 func mainCrypto() {
 	utils.InitLog("[暗号化の実験]")
-	log.Println("開始")
+	utils.StartLog()
 	// 共通鍵暗号方式 ブロック暗号化方式の AES
 	trainingCrypto.Example01()
 	// 共通鍵暗号方式 ブロック暗号化方式の AES CBC モード
@@ -102,5 +105,5 @@ func mainCrypto() {
 	trainingCrypto.Example09()
 	// パスワード
 	trainingCrypto.Example10()
-	log.Println("終了")
+	utils.EndLog()
 }

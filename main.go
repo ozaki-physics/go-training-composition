@@ -7,6 +7,7 @@ import (
 	"github.com/ozaki-physics/go-training-composition/package02"
 	"github.com/ozaki-physics/go-training-composition/trainingCrypto"
 	"github.com/ozaki-physics/go-training-composition/trainingIo"
+	"github.com/ozaki-physics/go-training-composition/trainingJson"
 	"github.com/ozaki-physics/go-training-composition/trainingTimeZone"
 	"github.com/ozaki-physics/go-training-composition/utils"
 	"log"
@@ -23,8 +24,8 @@ func main() {
 	// mainCrypto()
 	// ioFileVersion()
 	// ioTerminalVersion()
-	fileCrypto.RunFileEnCrypt()
-	fileCrypto.RunFileDeCrypt()
+	// mainFileCrypto()
+	mainJson()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -105,5 +106,21 @@ func mainCrypto() {
 	trainingCrypto.Example09()
 	// パスワード
 	trainingCrypto.Example10()
+	utils.EndLog()
+}
+
+// mainFileCrypto ファイルの中身を暗号化するツール
+func mainFileCrypto() {
+	fileCrypto.RunFileEnCrypt()
+	fileCrypto.RunFileDeCrypt()
+}
+
+// mainJson JSON 読み込みの勉強
+func mainJson() {
+	utils.InitLog("[JSONの実験]")
+	utils.StartLog()
+	// trainingJson.Example()
+	trainingJson.ReadJson01()
+	// trainingJson.ReadJson02()
 	utils.EndLog()
 }

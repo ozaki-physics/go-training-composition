@@ -6,6 +6,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"github.com/ozaki-physics/go-training-composition/trainingIo"
 	"github.com/ozaki-physics/go-training-composition/utils"
@@ -13,24 +14,51 @@ import (
 	"os"
 )
 
+// crypto 暗号化や復号で使う json の入れ物
 type crypto struct {
-	readpath  string
-	writepath string
+	Encode filepath
+	Decode filepath
+	Key    string
 }
 
-// RunFileEnCrypt ファイルの中身を暗号化する
-func RunFileEnCrypt() {
+// filepath encode または decode のときに使う ファイルの path
+type filepath struct {
+	Read  string
+	Write string
+}
+
+// getPathCrypto JSON から encode に使う情報を取り出す
+func getPathCrypto() crypto {
+	path := "fileCrypto/json/filepath.json"
+	// path := "fileCrypto/json/filepath_product.json"
+	// ファイルが存在するか確認
+	trainingIo.SearchFile(path)
+	bytes, err01 := os.ReadFile(path)
+	utils.ErrCheck(err01)
+
+	var cp crypto
+	err02 := json.Unmarshal(bytes, &cp)
+	utils.ErrCheck(err02)
+
+	return cp
+}
+
+// RunFileEnCrypto ファイルの中身を暗号化する
+func RunFileEnCrypto() {
 	utils.InitLog("[ファイルの中身を暗号化]")
 	utils.StartLog()
 
-	cp := getReadWriteEnCrypt()
-	key := getKey()
+	cp := getPathCrypto()
+	// ファイルが存在するか確認
+	trainingIo.SearchFile(cp.Encode.Read)
+	fp := cp.Encode
+	key := getKey(cp.Key)
 
-	fr, err := os.Open(cp.readpath)
+	fr, err := os.Open(fp.Read)
 	utils.ErrCheck(err)
 	defer fr.Close()
 
-	fw, err := os.Create(cp.writepath)
+	fw, err := os.Create(fp.Write)
 	utils.ErrCheck(err)
 	defer fw.Close()
 
@@ -38,7 +66,7 @@ func RunFileEnCrypt() {
 	for i := 1; s.Scan(); i++ {
 		oneLine := s.Text()
 		// 暗号化
-		cipherByte := enCrypt(oneLine, key)
+		cipherByte := enCrypto(oneLine, key)
 		// byte を 16進数へ
 		cipherString := hex.EncodeToString(cipherByte)
 		fmt.Printf("暗号文(16進数) %03d行目: %s\n", i, cipherString)
@@ -50,19 +78,22 @@ func RunFileEnCrypt() {
 	utils.EndLog()
 }
 
-// RunFileDeCrypt ファイルから復号する
-func RunFileDeCrypt() {
+// RunFileDeCrypto ファイルから復号する
+func RunFileDeCrypto() {
 	utils.InitLog("[ファイルの中身を復号]")
 	utils.StartLog()
 
-	cp := getReadWriteDnCrypt()
-	key := getKey()
+	cp := getPathCrypto()
+	// ファイルが存在するか確認
+	trainingIo.SearchFile(cp.Decode.Read)
+	fp := cp.Decode
+	key := getKey(cp.Key)
 
-	fr, err := os.Open(cp.readpath)
+	fr, err := os.Open(fp.Read)
 	utils.ErrCheck(err)
 	defer fr.Close()
 
-	fw, err := os.Create(cp.writepath)
+	fw, err := os.Create(fp.Write)
 	utils.ErrCheck(err)
 	defer fw.Close()
 
@@ -73,7 +104,7 @@ func RunFileDeCrypt() {
 		plainByte, err01 := hex.DecodeString(oneLine)
 		utils.ErrCheck(err01)
 		// 復号
-		plainText := deCrypt(plainByte, key)
+		plainText := deCrypto(plainByte, key)
 		fmt.Printf("復号文(string) %03d行目: %s\n", i, plainText)
 		// 書き出す
 		_, err02 := fmt.Fprintln(fw, plainText)
@@ -84,31 +115,8 @@ func RunFileDeCrypt() {
 	utils.EndLog()
 }
 
-// getReadWriteEnCrypt 暗号化用の読み込みファイルと書き込みファイルの struct を作る
-func getReadWriteEnCrypt() crypto {
-	readfile := "fileCrypto/plain/plainText.md"
-	// ファイルが存在するか確認
-	trainingIo.SearchFile(readfile)
-	writefile := "fileCrypto/cipher/cipherText.md"
-	cp := crypto{readpath: readfile, writepath: writefile}
-
-	return cp
-}
-
-// getReadWriteDnCrypt 復号用の読み込みファイルと書き込みファイルの struct を作る
-func getReadWriteDnCrypt() crypto {
-	readfile := "fileCrypto/cipher/cipherText.md"
-	// ファイルが存在するか確認
-	trainingIo.SearchFile(readfile)
-	writefile := "fileCrypto/decode/decodeText.md"
-	cp := crypto{readpath: readfile, writepath: writefile}
-
-	return cp
-}
-
 // getKey 外部ファイルから key を取得する
-func getKey() []byte {
-	keyfile := "fileCrypto/key/AES-CTR.key"
+func getKey(keyfile string) []byte {
 	// ファイルが存在するか確認
 	trainingIo.SearchFile(keyfile)
 
@@ -116,7 +124,7 @@ func getKey() []byte {
 	utils.ErrCheck(err01)
 	defer file.Close()
 
-	content := make([]byte, 16)
+	content := make([]byte, 32)
 	_, err02 := file.Read(content)
 
 	if err02 == io.EOF {
@@ -128,8 +136,8 @@ func getKey() []byte {
 	return content
 }
 
-// enCrypt 暗号化
-func enCrypt(plainText string, key []byte) []byte {
+// enCrypto 暗号化
+func enCrypto(plainText string, key []byte) []byte {
 	// cipher.Block を実装している AES 暗号化オブジェクトを生成する
 	block, err01 := aes.NewCipher(key)
 	utils.ErrCheck(err01)
@@ -152,8 +160,8 @@ func enCrypt(plainText string, key []byte) []byte {
 	return cipherByte
 }
 
-// deCrypt 復号
-func deCrypt(cipherByte []byte, key []byte) string {
+// deCrypto 復号
+func deCrypto(cipherByte []byte, key []byte) string {
 	// cipher.Block を実装している AES 暗号化オブジェクトを生成する
 	block, err01 := aes.NewCipher(key)
 	utils.ErrCheck(err01)

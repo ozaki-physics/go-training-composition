@@ -24,8 +24,8 @@ func main() {
 	// mainCrypto()
 	// ioFileVersion()
 	// ioTerminalVersion()
-	// mainFileCrypto()
-	mainJson()
+	mainFileCrypto()
+	// mainJson()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -111,8 +111,8 @@ func mainCrypto() {
 
 // mainFileCrypto ファイルの中身を暗号化するツール
 func mainFileCrypto() {
-	fileCrypto.RunFileEnCrypt()
-	fileCrypto.RunFileDeCrypt()
+	fileCrypto.RunFileEnCrypto()
+	fileCrypto.RunFileDeCrypto()
 }
 
 // mainJson JSON 読み込みの勉強
@@ -121,6 +121,5 @@ func mainJson() {
 	utils.StartLog()
 	// trainingJson.Example()
 	trainingJson.ReadJson01()
-	// trainingJson.ReadJson02()
 	utils.EndLog()
 }

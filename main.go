@@ -119,7 +119,7 @@ func mainFileCrypto() {
 func mainJson() {
 	utils.InitLog("[JSONの実験]")
 	utils.StartLog()
-	// trainingJson.Example()
+	trainingJson.Example()
 	trainingJson.ReadJson01()
 	utils.EndLog()
 }

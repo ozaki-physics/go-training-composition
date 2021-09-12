@@ -7,11 +7,15 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
+	"flag"
 	"fmt"
 	"github.com/ozaki-physics/go-training-composition/trainingIo"
 	"github.com/ozaki-physics/go-training-composition/utils"
 	"io"
+	"io/fs" // file system に特化
 	"os"
+	"strings"
 )
 
 // crypto 暗号化や復号で使う json の入れ物
@@ -27,9 +31,9 @@ type filepath struct {
 	Write string
 }
 
-// getPathCrypto JSON から encode に使う情報を取り出す
-func getPathCrypto() crypto {
-	path := "fileCrypto/json/filepath.json"
+// getPathCrypto JSON から 構造体に変換する
+func getPathCrypto(path string) crypto {
+	// path := "fileCrypto/json/filepath.json"
 	// path := "fileCrypto/json/filepath_product.json"
 	// ファイルが存在するか確認
 	trainingIo.SearchFile(path)
@@ -48,7 +52,7 @@ func RunFileEnCrypto() {
 	utils.InitLog("[ファイルの中身を暗号化]")
 	utils.StartLog()
 
-	cp := getPathCrypto()
+	cp := getPathCrypto(terminalArgs())
 	// ファイルが存在するか確認
 	trainingIo.SearchFile(cp.Encode.Read)
 	fp := cp.Encode
@@ -69,7 +73,7 @@ func RunFileEnCrypto() {
 		cipherByte := enCrypto(oneLine, key)
 		// byte を 16進数へ
 		cipherString := hex.EncodeToString(cipherByte)
-		fmt.Printf("暗号文(16進数) %03d行目: %s\n", i, cipherString)
+		// fmt.Printf("暗号文(16進数) %03d行目: %s\n", i, cipherString)
 		// 書き出す
 		_, err := fmt.Fprintln(fw, cipherString)
 		utils.ErrCheck(err)
@@ -83,7 +87,7 @@ func RunFileDeCrypto() {
 	utils.InitLog("[ファイルの中身を復号]")
 	utils.StartLog()
 
-	cp := getPathCrypto()
+	cp := getPathCrypto(terminalArgs())
 	// ファイルが存在するか確認
 	trainingIo.SearchFile(cp.Decode.Read)
 	fp := cp.Decode
@@ -105,7 +109,7 @@ func RunFileDeCrypto() {
 		utils.ErrCheck(err01)
 		// 復号
 		plainText := deCrypto(plainByte, key)
-		fmt.Printf("復号文(string) %03d行目: %s\n", i, plainText)
+		// fmt.Printf("復号文(string) %03d行目: %s\n", i, plainText)
 		// 書き出す
 		_, err02 := fmt.Fprintln(fw, plainText)
 		utils.ErrCheck(err02)
@@ -176,4 +180,64 @@ func deCrypto(cipherByte []byte, key []byte) string {
 	decryptStream.XORKeyStream(decryptedText, cipherByte[aes.BlockSize:])
 
 	return string(decryptedText)
+}
+
+// terminalArgs 実行時にコマンド引数から JSON ファイルのパスを受け取る
+func terminalArgs() string {
+	flag.Parse()
+	args := flag.Args()
+
+	var filepath string
+	if len(args) > 0 {
+		// コマンド引数の1個目を取得
+		filepath = args[0]
+		// ファイルが存在するか確認
+		trainingIo.SearchFile(filepath)
+	} else {
+		// 標準入力で JSON の filapath を受け取る
+		fmt.Println("JSON ファイルのパスが 実行時に渡されませんでした")
+		filepath = terminalInput()
+	}
+
+	fmt.Printf("%s で暗号化や復号をします\n", filepath)
+	return filepath
+}
+
+// terminalInput ターミナルの標準入力で JSON ファイルパスを受け取る
+func terminalInput() string {
+	r := bufio.NewReader(os.Stdin)
+loop:
+	fmt.Print("JSON ファイルパス, n(終了), test(実験用の filepath.json) のいずれかを入力してください > ")
+
+	input, err := r.ReadString('\n')
+	utils.ErrCheck(err)
+	// 標準入力の \n を削除して 全部小文字にする
+	input = strings.ToLower(strings.Trim(input, "\n"))
+
+	var filepath string
+	switch input {
+	case "":
+		fmt.Println("何も入力されていません")
+		fmt.Println("再度入力してください")
+		goto loop
+	case "n":
+		fmt.Println("終了します")
+	case "test":
+		fmt.Println("実験用の fileCrypto/json/filepath.json を使用します")
+		filepath = "fileCrypto/json/filepath.json"
+	default:
+		fmt.Printf("%s が存在するか確認します\n", input)
+		_, err := os.Stat(input)
+		if errors.Is(err, fs.ErrNotExist) {
+			fmt.Println("ファイルが存在しません")
+			goto loop
+		} else {
+			// ファイルが存在しない以外のエラー
+			utils.ErrCheck(err)
+		}
+		fmt.Println("ファイルの存在が確認できました")
+		filepath = input
+	}
+
+	return filepath
 }

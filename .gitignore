@@ -1,3 +1,5 @@
+fileCrypto/json/*
+!fileCrypto/json/filepath.json
 fileCrypto/cipher/*
 !fileCrypto/cipher/cipherText.md
 fileCrypto/plain/*

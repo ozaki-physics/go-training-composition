@@ -1,0 +1,11 @@
+{
+  "encode": {
+    "read": "fileCrypto/plain/plainText.md",
+    "write": "fileCrypto/cipher/cipherText.md"
+  },
+  "decode": {
+    "read": "fileCrypto/cipher/cipherText.md",
+    "write": "fileCrypto/decode/decodeText.md"
+  },
+  "key": "fileCrypto/key/AES-CTR.key"
+}

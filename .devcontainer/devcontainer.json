@@ -1,0 +1,26 @@
+{
+  "name": "Docker Compose(VS Code in Container)",
+  // VS Code で開きたいコンテナ
+  "dockerComposeFile": [
+    "../docker-compose.yml"
+  ],
+  // 'service' プロパティは、VS Code が使用すべきコンテナのサービス名
+	"service": "go_training",
+  // オプションの 'workspaceFolder' プロパティは、VS Code が接続時にデフォルトで開くべきパス
+  // パスを"/" にしても VS Code は 同じ場所を開く Dockerfile で WORKDIR を指定してるから?
+  // 指定しなくても変わらなかった 分からないから一旦放置する
+	"workspaceFolder": "/go/src/github.com/ozaki-physics/go-training-composition",
+  // コンテナ内の VS Code で使いたい拡張機能
+	"extensions": [
+    // golang のデバックする拡張機能
+    "golang.go",
+    // git の履歴が確認できる拡張機能(ホスト側だけの拡張が推奨) 視覚的に見やすくしたいから
+    "donjayamanne.githistory",
+    // markdown を html にする拡張機能(ホスト側だけの拡張が推奨) ドキュメントを書く可能性があるから
+    "yzane.markdown-pdf",
+    // 開いてるファイルたちを保存する拡張機能
+    "amodio.restore-editors",
+    // Docker の拡張機能(ホスト側だけの拡張が推奨) コンテナ作った後に Dockerfile を編集することは無いはずだから使わない
+    // "ms-azuretools.vscode-docker",
+  ],
+}

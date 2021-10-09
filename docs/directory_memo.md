@@ -100,6 +100,15 @@ golang では -なんとか を フラグという
 -v フラグ は 削除されたモジュールを出力する
 詳しくは `go help mod tidy`
 
+### 外部モジュールのバージョンアップ
+`docker-compose up -d`
+`docker-compose exec go_training bash`
+`go get -d -v -u github.com/gin-gonic/gin` モジュールバージョンアップ
+`go mod tidy -v` 不要モジュールの削除
+`docker-compose down`
+`docker image rm go1.17:training_composition_vscode_in_container`
+`docker-compose build` docker image の作り直し
+
 ### go install の挙動
 /go/src/github.com/ozaki-physics/go-training-composition で
 `go install github.com/ramya-rao-a/go-outline` をやろうとしたら

@@ -61,6 +61,25 @@ go.mod 編集のための go get
 `go mod tidy` で、使われていない依存モジュールを削除できるから
 1.15 -> 1.17 に移行した
 
+2021/10/09 go:1.17 で go get 使ってインストールしようとしたら非推奨だと言われた
+今後は `go install` を使わないといけない
+```bash
+go get: installing executables with 'go get' in module mode is deprecated.
+        To adjust and download dependencies of the current module, use 'go get -d'.
+        To install using requirements of the current module, use 'go install'.
+        To install ignoring the current module, use 'go install' with a version,
+        like 'go install example.com/cmd@latest'.
+        For more information, see https://golang.org/doc/go-get-install-deprecation
+        or run 'go help get' or 'go help install'.
+go get: モジュールモードで 'go get' を使って実行ファイルをインストールすることは非推奨です。
+        現在のモジュールの依存関係を調整してダウンロードするには、'go get -d'を使ってください。
+        現在のモジュールの要件を使ってインストールするには、'go install'を使ってください。
+        現在のモジュールを無視してインストールするには、'go install'にバージョンを指定して
+        'go install example.com/cmd@latest' のようにしてください
+        詳細については、https://golang.org/doc/go-get-install-deprecation
+        または 'go help get' や 'go help install' を実行してください。
+```
+
 ## 疑問
 go.mod にどういう意味で記述されたのか?
 go.sum の意味は?

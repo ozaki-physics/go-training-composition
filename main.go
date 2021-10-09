@@ -25,9 +25,9 @@ func main() {
 	// mainCrypto()
 	// ioFileVersion()
 	// ioTerminalVersion()
-	mainFileCrypto()
+	// mainFileCrypto()
 	// mainJson()
-	// mainGin()
+	mainGin()
 }
 
 // mainPkg ディレクトリ構成を試す

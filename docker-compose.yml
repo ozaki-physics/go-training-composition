@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: go1.17:training_composition
+    image: go1.17:training_composition_vscode_in_container
     container_name: go_training
     tty: true
     volumes:
@@ -12,3 +12,7 @@ services:
       # コンテナ側は相対パス書けない
     ports:
       - "127.0.0.1:8080:8080"
+    # docker-compose でマウントしたり, go run で動かしたり, build し直したり と開発用の操作が多いから
+    # 自動でサーバ等動いてポートが埋まらないようにするため
+    # コメントアウトしても image 作成時点のバイナリファイルが実行されることに注意
+    command: bash

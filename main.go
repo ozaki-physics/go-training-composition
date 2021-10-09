@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/ozaki-physics/go-training-composition/fileCrypto"
 	"github.com/ozaki-physics/go-training-composition/package01"
 	"github.com/ozaki-physics/go-training-composition/package02"
@@ -24,8 +25,9 @@ func main() {
 	// mainCrypto()
 	// ioFileVersion()
 	// ioTerminalVersion()
-	mainFileCrypto()
+	// mainFileCrypto()
 	// mainJson()
+	mainGin()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -42,7 +44,10 @@ func mainPkg() {
 func ioFileVersion() {
 	utils.InitLog("[入出力の実験]")
 	log.Println("ファイル版 開始")
-	f := trainingIo.ThisDirFile{"trainingIo/read.md", "trainingIo/write.md"}
+	f := trainingIo.ThisDirFile{
+		ReadName:  "trainingIo/read.md",
+		WriteName: "trainingIo/write.md",
+	}
 	fmt.Printf("f := %v\n", f)
 	trainingIo.SearchFile(f.ReadName)
 	trainingIo.OpenFile(f.ReadName)
@@ -122,4 +127,16 @@ func mainJson() {
 	trainingJson.Example()
 	trainingJson.ReadJson01()
 	utils.EndLog()
+}
+
+// mainGin 外部パッケージを使ってサーバを立てる
+func mainGin() {
+	r := gin.Default()
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+	r.Run() // listen and serve on 0.0.0.0:8080
+	// http://localhost:8080/ping でアクセスできた
 }

@@ -52,14 +52,111 @@ docker 内の`/go/src/github.com/ozaki-physics/go-training-composition`にマウ
 ## 試しに外部モジュールを インストールしてみる
 [Gin の公式サイトの Quickstart](https://gin-gonic.com/docs/quickstart/)
 `$ go get -u github.com/gin-gonic/gin`
+今後は `$ go get -d -v -u パッケージ名` が良さそう
 
 [Go1.16からの go get と go install について](https://qiita.com/eihigh/items/9fe52804610a8c4b7e41)
+>Go Module追加編集のためのgo get、ツールなどのバイナリインストールのgo installと住み分けることができそう
 go 1.16 からは go install と go get の役割が整理されていくらしい
 バイナリのビルドとインストールのための go install
 go.mod 編集のための go get
 
+2021/10/09 go:1.17 で go get 使ってインストールしようとしたら非推奨だと言われた
+```bash
+go get: installing executables with 'go get' in module mode is deprecated.
+        To adjust and download dependencies of the current module, use 'go get -d'.
+        To install using requirements of the current module, use 'go install'.
+        To install ignoring the current module, use 'go install' with a version,
+        like 'go install example.com/cmd@latest'.
+        For more information, see https://golang.org/doc/go-get-install-deprecation
+        or run 'go help get' or 'go help install'.
+go get: モジュールモードで 'go get' を使って実行ファイルをインストールすることは非推奨です。
+        現在のモジュールの依存関係を調整してダウンロードするには、'go get -d'を使ってください。
+        現在のモジュールの要件を使ってインストールするには、'go install'を使ってください。
+        現在のモジュールを無視してインストールするには、'go install'にバージョンを指定して
+        'go install example.com/cmd@latest' のようにしてください
+        詳細については、https://golang.org/doc/go-get-install-deprecation
+        または 'go help get' や 'go help install' を実行してください。
+```
+go では インストールとダウンロードは別の概念
+バイナリをインストールするのがダメなだけで go.mod を編集するコマンドは go get -d のままみたい
+
+開発環境など 環境的なパッケージは `go install` で使えるようにし
+プロダクトで使うパッケージは go.mod に書くために `go get -d` を使えば良さそう
+
+### go get コマンド
+golang では -なんとか を フラグという
+-v フラグ は 詳細な進行状況とデバッグ出力を有効にする
+-u フラグ は マイナーリリースなど依存パッケージまでネットワークから更新する 使用しているパッケージの更新にも使える
+[Go1.17における go get の変更点](https://future-architect.github.io/articles/20210818a/)
+-d フラグ は ソースをダウンロードし ビルド(インストール)はされないっぽい
+
+### go mod tidy
 `go mod tidy` で、使われていない依存モジュールを削除できるから
 1.15 -> 1.17 に移行した
+
+[Goメモ-161 (go.mod の 内容を Go 1.17 に調整する)](https://devlights.hatenablog.com/entry/2021/09/02/112354)
+`go mod tidy -go=1.17` と -go フラグを付けると go のバージョン変更を go.mod に反映してくれるらしい
+
+-v フラグ は 削除されたモジュールを出力する
+詳しくは `go help mod tidy`
+
+### go install の挙動
+/go/src/github.com/ozaki-physics/go-training-composition で
+`go install github.com/ramya-rao-a/go-outline` をやろうとしたら
+```bash
+no required module provides package github.com/ramya-rao-a/go-outline; to add it:
+        go get github.com/ramya-rao-a/go-outline
+```
+と言われて
+/ で
+`go install github.com/ramya-rao-a/go-outline` をやろうとしたら
+```bash
+go install: version is required when current directory is not in a module
+        Try 'go install github.com/ramya-rao-a/go-outline@latest' to install the latest version
+```
+って言われて
+`go install github.com/ramya-rao-a/go-outline@latest` を実行したら
+/go/bin に go-outline が追加されて go.mod は編集されなかった
+
+## ビルドについて
+`go build` は go.mod があるディレクトリじゃないとできない
+-o フラグで build したバイナリをどこに保存するか決められる(相対パスも絶対パスも使える)
+ビルドするファイル名を指定することもできる 指定したファイル名がバイナリファイル名になる
+指定しないとプロジェクトのディレクトリ名が バイナリファイル名になる
+
+以下は具体例
+/go で `go build` したら
+```bash
+go: go.mod file not found in current directory or any parent directory; see 'go help modules'
+```
+go.mod が見つからないって言われたから
+/go/src/github.com/ozaki-physics/go-training-composition で `go build` したら
+/go/src/github.com/ozaki-physics/go-training-composition に `go-training-composition` というバイナリができた
+/go/src/github.com/ozaki-physics/go-training-composition で `go build main.go` したときと同じバイナリ
+
+/go/src/github.com/ozaki-physics/go-training-composition で
+`go install github.com/ozaki-physics/go-training-composition` ってやったら
+/go/bin に go-training-composition のバイナリが生成された
+そして使えた
+だけど build しないで install するのは良くない気がしている
+
+/go/bin は `go install` のための場所で 自分のプロジェクトの build したバイナリを置く場所じゃないかも
+でも /go/src/github.com/ozaki-physics/go-training-composition の中に /bin を作って
+ビルドしたら /go-training-composition/bin の中に入れるのも違う気がする
+だって マウントするときに /go-training-composition ごと上書きされてしまうから
+じゃあ ソースコードを全部 /go-training-composition/src に入れて /go-training-composition/src だけマウントする?
+たしかにできるが プロジェクトの中に /bin と /src が存在していいのか?
+-> どーせ build した時に /go-training-composition/bin にバイナリファイルを置く指定をするなら /go/bin を流用する
+
+/go/src/github.com/ozaki-physics/go-training-composition で
+`go build -o /go/bin` ってやったら
+/go/bin に go-training-composition のバイナリが生成された
+そして使えた
+`go build -o /go/bin main.go` ってやったら
+/go/bin に main のバイナリが生成された
+`go build -o ../../../../bin` ってやったら
+/go/bin に go-training-composition のバイナリが生成された
+相対パスでも書けるが 絶対の方が見やすい
 
 ## 疑問
 go.mod にどういう意味で記述されたのか?

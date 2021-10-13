@@ -1,8 +1,8 @@
 ---
-name: "ローカルで作ったテンプレート"
+name: ローカルで作ったテンプレート
 about: テンプレートの目的
 title: issue タイトル
-labels: ""
+labels: ''
 assignees: ''
 
 ---

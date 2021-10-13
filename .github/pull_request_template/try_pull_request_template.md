@@ -8,4 +8,6 @@ Changes proposed in this pull request;
 - 
 - 
 
+try を消した pull_request_template.md はうまくいくのか
+
 @ozaki-physics

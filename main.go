@@ -20,14 +20,14 @@ func init() {
 }
 
 func main() {
-	// mainPkg()
+	mainPkg()
 	// mainTimeZone()
 	// mainCrypto()
 	// ioFileVersion()
 	// ioTerminalVersion()
 	// mainFileCrypto()
 	// mainJson()
-	mainGin()
+	// mainGin()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -116,7 +116,7 @@ func mainCrypto() {
 
 // mainFileCrypto ファイルの中身を暗号化するツール
 func mainFileCrypto() {
-	fileCrypto.RunFileEnCrypto()
+	// fileCrypto.RunFileEnCrypto()
 	fileCrypto.RunFileDeCrypto()
 }
 

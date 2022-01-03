@@ -1,10 +1,7 @@
 package presentation
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 )
 
@@ -31,34 +28,30 @@ func (ro *routes) InitRouting(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		fmt.Fprintln(w, "GET だよ")
-		ro.taskHandler.Get(w, r)
+		err := ro.taskHandler.Get(w, r)
+		if err != nil {
+			http.Error(w, "Internal Server Error\n"+err.Error(), 500)
+		}
 	case http.MethodPost:
-		body := r.Body
-		defer body.Close()
-
-		buf := new(bytes.Buffer)
-		io.Copy(buf, body)
-
-		var hello helloJSON
-		json.Unmarshal(buf.Bytes(), &hello)
-
-		w.WriteHeader(http.StatusCreated)
-		fmt.Fprintf(w, "POST: %+v \n", hello)
-
 		fmt.Fprintln(w, "POST だよ")
-		ro.taskHandler.Post(w, r)
+		err := ro.taskHandler.Post(w, r)
+		if err != nil {
+			http.Error(w, "Internal Server Error\n"+err.Error(), 500)
+		}
 	case http.MethodPut:
 		fmt.Fprintln(w, "PUT だよ")
-		ro.taskHandler.Put(w, r)
+		err := ro.taskHandler.Put(w, r)
+		if err != nil {
+			http.Error(w, "Internal Server Error\n"+err.Error(), 500)
+		}
 	case http.MethodDelete:
 		fmt.Fprintln(w, "DELETE だよ")
-		ro.taskHandler.Delete(w, r)
+		err := ro.taskHandler.Delete(w, r)
+		if err != nil {
+			http.Error(w, "Internal Server Error\n"+err.Error(), 500)
+		}
 	default:
 		fmt.Fprintln(w, "許可されたメソッドじゃないよ")
 	}
-}
 
-type helloJSON struct {
-	UserName string `json:"user_name"`
-	Content  string `json:"content"`
 }

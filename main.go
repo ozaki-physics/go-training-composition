@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/ozaki-physics/go-training-composition/ddd01"
+	"github.com/ozaki-physics/go-training-composition/ddd02"
 	"github.com/ozaki-physics/go-training-composition/fileCrypto"
 	"github.com/ozaki-physics/go-training-composition/package01"
 	"github.com/ozaki-physics/go-training-composition/package02"
@@ -28,6 +30,8 @@ func main() {
 	// mainFileCrypto()
 	// mainJson()
 	// mainGin()
+	// mainAPIDDD01()
+	// mainAPIDDD02()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -139,4 +143,12 @@ func mainGin() {
 	})
 	r.Run() // listen and serve on 0.0.0.0:8080
 	// http://localhost:8080/ping でアクセスできた
+}
+
+func mainAPIDDD01() {
+	ddd01.MainApi()
+}
+
+func mainAPIDDD02() {
+	ddd02.MainApi()
 }

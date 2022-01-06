@@ -1,8 +1,37 @@
 # go-training-composition
-Go 言語のプロジェクトを作るとき どのようなディレクトリ構成にするか
+Go 言語で様々なことをやってみる練習リポジトリ
 
 ## 目的 Overview
-Go でアプリを作るときに シンプルなディレクトリ構成を勉強する
+### Go でアプリを作るための以下の練習
+
+- それなりに練習した  
+  - [暗号理論(crypto パッケージ)の勉強](./docs/cryptography_memo.md): [サンプル](./trainingCrypto)  
+  - [ファイル I/O の勉強](./docs/ioFile_memo.md): [サンプル](./trainingIo/ioFile.go)  
+    (おかげで 公式ドキュメントを読む力がついたと思う)  
+  - ターミナル I/O の勉強: [サンプル](./trainingIo/ioTerminal.go)  
+  - レイヤードアーキテクチャの勉強: [サンプル01](./ddd01), [サンプル02](./ddd02)  
+  - [テスト駆動開発](./docs/test_memo.md): [サンプル](./trainingTest)  
+
+- ふつうに練習した  
+  - [シンプルなディレクトリ構成](./docs/directory_memo.md)  
+  - [外部パッケージのインストール](./docs/directory_memo.md)  
+  - [JSON パッケージの勉強](./trainingJson)  
+  - [VS Code in Container の設定](./.devcontainer/devcontainer.json)  
+  - [GitHub の issue, pull Request の テンプレート作成](./.github)  
+  - GitHub でリポジトリにタグをつける方法と リリースノートの自動生成  
+
+- ちょっとだけ練習した  
+  - [Log パッケージの勉強](./docs/err_memo.md): [サンプル](./utils/util.go)  
+  - [TimeZone パッケージの勉強](./trainingTimeZone)  
+  - [godoc の書き方](./docs/godoc_memo.md)  
+
+### 作ったもの
+
+- [テキストファイルの中身を暗号化するツール](./fileCrypto/use.go)
+  - パスワード, 入力ファイルの path, 出力ファイルの path は JSON ファイルに書いて 読み込ませる
+  - ファイル, ターミナル I/O と crypto パッケージ
+
+
 
 ## インストール方法 Install
 

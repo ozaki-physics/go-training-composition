@@ -75,7 +75,7 @@ var c2 Number = 1
 fmt.Println(c1 == c2) // true
 ```
 
-### Go 言語の継承の考え方の一例
+### Go 言語の継承の考え方
 そもそも 継承ではなく インタフェースを使うべきと言われている  
 [Go言語(golang) 構造体の定義と使い方](https://golang.hateblo.jp/entry/golang-how-to-use-struct)  
 
@@ -138,3 +138,7 @@ func main() {
   b.A.Print() // struct A name: Tanaka age: 31
 }
 ```
+
+[公式ドキュメント Embedding(埋め込み)](https://go.dev/doc/effective_go#embedding)  
+インタフェース の struct には インタフェースしか埋め込めない  
+構造体を定義するときに型を書かないのはなんで?  

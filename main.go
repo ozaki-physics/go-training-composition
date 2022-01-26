@@ -12,6 +12,7 @@ import (
 	"github.com/ozaki-physics/go-training-composition/trainingIo"
 	"github.com/ozaki-physics/go-training-composition/trainingJson"
 	"github.com/ozaki-physics/go-training-composition/trainingTimeZone"
+	"github.com/ozaki-physics/go-training-composition/trainingEmbedding"
 	"github.com/ozaki-physics/go-training-composition/utils"
 	"log"
 )
@@ -32,6 +33,7 @@ func main() {
 	// mainGin()
 	// mainAPIDDD01()
 	// mainAPIDDD02()
+	// mainEmbedding()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -151,4 +153,8 @@ func mainAPIDDD01() {
 
 func mainAPIDDD02() {
 	ddd02.MainApi()
+}
+
+func mainEmbedding() {
+	trainingEmbedding.Example01()
 }

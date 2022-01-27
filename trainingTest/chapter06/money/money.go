@@ -1,7 +1,7 @@
 package money
 
 // AmountGetter インタフェースを定義する意味は
-// 引数で 型一致 から インタフェースを実装しているか と制限を緩くするため
+// Equals() の引数で 型一致 から インタフェースを実装しているか と制限を緩くするため
 // このインタフェースは private にしても動作するが インタフェースという性質上 public にしておく
 type AmountGetter interface {
 	// 実装を強制するメソッドは private でもよい
@@ -13,6 +13,11 @@ type Money struct {
 	amount int
 }
 
+// getAmount 
+// レシーバをポインタにすると テストが通らなくなる
+// なぜなら ポインタにすると 埋め込みの子(money.Dollar)が インタフェース(money.AmountGetter)を
+// 実装してないことになるから 埋め込みの子は Equals() の引数になれないと言われる
+// なんか納得できないけど そういうものと認識して一旦置いとこう
 func (m Money) getAmount() int {
 	return m.amount
 }

@@ -151,3 +151,29 @@ func main() {
 ```
 
 [Go言語(golang) 構造体の定義と使い方](https://golang.hateblo.jp/entry/golang-how-to-use-struct)  
+
+### Go の toString 的なメソッド
+任意の表記にして出力する方法は その struct に String メソッドを定義すること  
+String メソッドのレシーバをポインタにすると ポインタとして渡された構造体だけに フォーマットが適用される  
+
+```go
+// int 型に 異なるラベルを付ける
+type anotherInt int
+
+func (a *anotherInt) String() string {
+	return fmt.Sprintf("anotherInt: %d\n", a)
+}
+
+func main() {
+	var i anotherInt
+	i = 10
+	fmt.Println(i) // 10
+	fmt.Println(&i) // 0xc0000be000
+  // String を定義した後
+	fmt.Println(i) // 10
+	fmt.Println(&i) // anotherInt: 824634474496 変な値にはなるがフォーマットは適用されている
+}
+```
+
+### レシーバをポインタにするなら 一度インスタンスを生成しないと そのメソッドが使えない感じがする
+Factory Method パターン と相性が悪い?  

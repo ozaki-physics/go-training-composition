@@ -1,8 +1,8 @@
 package money_test
 
 import (
-	"testing"
 	"fmt"
+	"testing"
 
 	. "github.com/ozaki-physics/go-training-composition/trainingTest/chapter10/money"
 )

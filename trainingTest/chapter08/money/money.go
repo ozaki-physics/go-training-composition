@@ -9,7 +9,7 @@ type Accessor interface {
 
 type Money struct {
 	// 可視性をプライベートにすることで setter が存在しないことの意味が生まれる
-	volume int
+	volume       int
 	currencyCode string
 }
 

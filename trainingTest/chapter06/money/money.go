@@ -13,7 +13,7 @@ type Money struct {
 	amount int
 }
 
-// getAmount 
+// getAmount
 // レシーバをポインタにすると テストが通らなくなる
 // なぜなら ポインタにすると 埋め込みの子(money.Dollar)が インタフェース(money.AmountGetter)を
 // 実装してないことになるから 埋め込みの子は Equals() の引数になれないと言われる

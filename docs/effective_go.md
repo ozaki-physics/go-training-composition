@@ -1,4 +1,4 @@
-## Go 言語の仕様
+## 効果的な Go
 ### 構造体を比較するとき 自動で中身の値比較をしてくれる
 Go の言語仕様として __構造体の比較は ポインタの比較じゃなくて構造体の中の値の比較__ になっているらしい!  
 [Comparison operators](https://go.dev/ref/spec#Comparison_operators)  

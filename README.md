@@ -10,9 +10,10 @@ Go 言語で様々なことをやってみる練習リポジトリ
     (おかげで 公式ドキュメントを読む力がついたと思う)  
   - ターミナル I/O の勉強: [サンプル](./trainingIo/ioTerminal.go)  
   - レイヤードアーキテクチャの勉強: [サンプル01](./ddd01), [サンプル02](./ddd02)  
-  - [テスト駆動開発](./docs/test_memo.md): [サンプル](./trainingTest)  
+  - [テスト駆動開発](./docs/test_memo.md): [書籍の要約](./docs/tdd_summary.md), [サンプル](./trainingTest)  
 
 - ふつうに練習した  
+  - [Go Tour](./docs/go_tour.md): [サンプル](./goTour)  
   - [シンプルなディレクトリ構成](./docs/directory_memo.md)  
   - [外部パッケージのインストール](./docs/directory_memo.md)  
   - [JSON パッケージの勉強](./trainingJson)  
@@ -24,6 +25,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - [Log パッケージの勉強](./docs/err_memo.md): [サンプル](./utils/util.go)  
   - [TimeZone パッケージの勉強](./trainingTimeZone)  
   - [godoc の書き方](./docs/godoc_memo.md)  
+  - [Go 言語の仕様](./docs/golang_memo.md)  
 
 ### 作ったもの
 

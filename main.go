@@ -6,9 +6,11 @@ import (
 	"github.com/ozaki-physics/go-training-composition/ddd01"
 	"github.com/ozaki-physics/go-training-composition/ddd02"
 	"github.com/ozaki-physics/go-training-composition/fileCrypto"
+	"github.com/ozaki-physics/go-training-composition/goTour"
 	"github.com/ozaki-physics/go-training-composition/package01"
 	"github.com/ozaki-physics/go-training-composition/package02"
 	"github.com/ozaki-physics/go-training-composition/trainingCrypto"
+	"github.com/ozaki-physics/go-training-composition/trainingEmbedding"
 	"github.com/ozaki-physics/go-training-composition/trainingIo"
 	"github.com/ozaki-physics/go-training-composition/trainingJson"
 	"github.com/ozaki-physics/go-training-composition/trainingTimeZone"
@@ -32,6 +34,8 @@ func main() {
 	// mainGin()
 	// mainAPIDDD01()
 	// mainAPIDDD02()
+	// mainEmbedding()
+	// mainGoTour()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -151,4 +155,12 @@ func mainAPIDDD01() {
 
 func mainAPIDDD02() {
 	ddd02.MainApi()
+}
+
+func mainEmbedding() {
+	trainingEmbedding.Example01()
+}
+
+func mainGoTour() {
+	goTour.Main()
 }

@@ -16,7 +16,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
 - ふつうに練習した  
   - [Go Tour](./docs/go_tour.md): [サンプル](./goTour)  
   - [シンプルなディレクトリ構成](./docs/directory_memo.md)  
-  - [外部パッケージのインストール](./docs/directory_memo.md)  
+  - [外部パッケージのインストール](./docs/go_module.md)  
   - [JSON パッケージの勉強](./trainingJson)  
   - [VS Code in Container の設定](./.devcontainer/devcontainer.json)  
   - [GitHub の issue, pull Request の テンプレート作成](./.github)  

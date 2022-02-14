@@ -1,33 +1,14 @@
 ## Go のプロジェクト構成を調べる
-go:1.15 には /go ディレクトリの下に /bin /src の2個がある
-/go の直下に /pkg は見当たらない
+go:1.15 には /go ディレクトリの下に /bin /src の2個がある  
+/go の直下に /pkg は見当たらない  
+`go env`で go で使うような path が全部確認できる  
 
-go.mod はどの path に作るのがいいのか?
+[Standard Go Project Layout](https://github.com/golang-standards/project-layout/blob/master/README_ja.md)を 参考にする人が多いが 細かすぎるのでは? という意見もある  
 
-`go env`で go で使うような path が全部確認できる
+[標準パッケージの fmt](https://github.com/golang/go/tree/master/src/fmt)では 1つのパッケージの直下に .go をめっちゃ置く  
 
-### 記事を読んで
-パッケージを公開することを考えて src/github.com/ozaki-physics/go-training-chat にするらしい
-github の リポジトリ作ると /github.com/ozaki-physics/リポジトリ名 になる
-go のパッケージ思想的に 外部パッケージをインストールして使うとき github から取ってくるから
-go.mod は パッケージに1個? src に1個?
-リポジトリに1個っぽい? つまり1パッケージに1個?
-すると クリーンアーキテクチャではレイヤーごとにパッケージにするから go.mod 多くなるけどいいの?
-ってなるから たぶんリポジトリというかアプリあたり1個だろう
-
-[Standard Go Project Layout](https://github.com/golang-standards/project-layout/blob/master/README_ja.md)を
-参考にする人が多いが 細かすぎるのでは? という意見もある
-[標準パッケージの fmt](https://github.com/golang/go/tree/master/src/fmt)では
-1つのパッケージの直下に .go をめっちゃ置く
-[Go 言語のプロジェクト構成](https://blog.tokoyax.com/entry/go/project)
-testdata や _ で始まるディレクトリは Go のパッケージとはみなされないから Go 以外のコードやファイルを置くといいらしい
-[Golang - Go Modulesで開発環境の用意する](https://qiita.com/so-heee/items/56f5317b42cec3d94383)
-公式の[Go Modules](https://github.com/golang/go/wiki/Modules)より
-`$ go mod init github.com/my/repo`
-[Goプロジェクトのはじめかたとおすすめライブラリ8.5選。ひな形にも使えるサンプルもあるよ。](https://qiita.com/yagi_eng/items/65cd812107362d36ae86)
->各ソースコードの import 文にライブラリのパスを記載しておくと go run の時に自動でインストールしてくれます。
-なるほど だから import は github.com/ って書いていくのか
-この記事の モジュール名と github のリポジトリ名は同義かな
+[Go 言語のプロジェクト構成](https://blog.tokoyax.com/entry/go/project)  
+testdata や _ で始まるディレクトリは Go のパッケージとはみなされないから Go 以外のコードやファイルを置くといいらしい  
 
 ## 定義
 この git リポジトリを
@@ -47,76 +28,6 @@ docker 内の`/go/src/github.com/ozaki-physics/go-training-composition`にマウ
 個人的には パッケージ名 もスネークケースになる気がするのだが...笑
 
 ディレクトリ名はケバブケースを使っているらしい
-
-
-## 試しに外部モジュールを インストールしてみる
-[Gin の公式サイトの Quickstart](https://gin-gonic.com/docs/quickstart/)
-`$ go get -u github.com/gin-gonic/gin`
-今後は `$ go get -d -v -u パッケージ名` が良さそう
-
-[Go1.16からの go get と go install について](https://qiita.com/eihigh/items/9fe52804610a8c4b7e41)
->Go Module追加編集のためのgo get、ツールなどのバイナリインストールのgo installと住み分けることができそう
-go 1.16 からは go install と go get の役割が整理されていくらしい
-バイナリのビルドとインストールのための go install
-go.mod 編集のための go get
-
-2021/10/09 go:1.17 で go get 使ってインストールしようとしたら非推奨だと言われた
-```bash
-go get: installing executables with 'go get' in module mode is deprecated.
-        To adjust and download dependencies of the current module, use 'go get -d'.
-        To install using requirements of the current module, use 'go install'.
-        To install ignoring the current module, use 'go install' with a version,
-        like 'go install example.com/cmd@latest'.
-        For more information, see https://golang.org/doc/go-get-install-deprecation
-        or run 'go help get' or 'go help install'.
-go get: モジュールモードで 'go get' を使って実行ファイルをインストールすることは非推奨です。
-        現在のモジュールの依存関係を調整してダウンロードするには、'go get -d'を使ってください。
-        現在のモジュールの要件を使ってインストールするには、'go install'を使ってください。
-        現在のモジュールを無視してインストールするには、'go install'にバージョンを指定して
-        'go install example.com/cmd@latest' のようにしてください
-        詳細については、https://golang.org/doc/go-get-install-deprecation
-        または 'go help get' や 'go help install' を実行してください。
-```
-go では インストールとダウンロードは別の概念
-バイナリをインストールするのがダメなだけで go.mod を編集するコマンドは go get -d のままみたい
-
-開発環境など 環境的なパッケージは `go install` で使えるようにし
-プロダクトで使うパッケージは go.mod に書くために `go get -d` を使えば良さそう
-
-### go get コマンド
-golang では -なんとか を フラグという
--v フラグ は 詳細な進行状況とデバッグ出力を有効にする
--u フラグ は マイナーリリースなど依存パッケージまでネットワークから更新する 使用しているパッケージの更新にも使える
-[Go1.17における go get の変更点](https://future-architect.github.io/articles/20210818a/)
--d フラグ は ソースをダウンロードし ビルド(インストール)はされないっぽい
-
-### go mod tidy
-`go mod tidy` で、使われていない依存モジュールを削除できるから
-1.15 -> 1.17 に移行した
-
-[Goメモ-161 (go.mod の 内容を Go 1.17 に調整する)](https://devlights.hatenablog.com/entry/2021/09/02/112354)
-`go mod tidy -go=1.17` と -go フラグを付けると go のバージョン変更を go.mod に反映してくれるらしい
-
--v フラグ は 削除されたモジュールを出力する
-詳しくは `go help mod tidy`
-
-### go install の挙動
-/go/src/github.com/ozaki-physics/go-training-composition で
-`go install github.com/ramya-rao-a/go-outline` をやろうとしたら
-```bash
-no required module provides package github.com/ramya-rao-a/go-outline; to add it:
-        go get github.com/ramya-rao-a/go-outline
-```
-と言われて
-/ で
-`go install github.com/ramya-rao-a/go-outline` をやろうとしたら
-```bash
-go install: version is required when current directory is not in a module
-        Try 'go install github.com/ramya-rao-a/go-outline@latest' to install the latest version
-```
-って言われて
-`go install github.com/ramya-rao-a/go-outline@latest` を実行したら
-/go/bin に go-outline が追加されて go.mod は編集されなかった
 
 ## ビルドについて
 `go build` は go.mod があるディレクトリじゃないとできない

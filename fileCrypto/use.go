@@ -107,8 +107,12 @@ func RunFileDeCrypto() {
 		// 16進数を byte へ
 		plainByte, err01 := hex.DecodeString(oneLine)
 		utils.ErrCheck(err01)
-		// 復号
-		plainText := deCrypto(plainByte, key)
+		// 本来であれば空白行も暗号化されているはずだが もし暗号文の中に空白行があったときの対応
+		plainText := "\n"
+		if len(plainByte) != 0 {
+			// 復号
+			plainText = deCrypto(plainByte, key)
+		}
 		// fmt.Printf("復号文(string) %03d行目: %s\n", i, plainText)
 		// 書き出す
 		_, err02 := fmt.Fprintln(fw, plainText)

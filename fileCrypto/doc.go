@@ -12,6 +12,9 @@
 //
 // 実行するときに コマンド引数で JSON ファイルのパスを渡すか
 // 実行したあとに 標準入力で JSON ファイルのパスを渡す
+//
+// sample
+// go run main.go fileCrypto/json/filepath_product.json
 package fileCrypto
 
 /*

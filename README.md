@@ -17,10 +17,11 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - [Go Tour](./docs/go_tour.md): [サンプル](./goTour)  
   - [シンプルなディレクトリ構成](./docs/directory_memo.md)  
   - [外部パッケージのインストール](./docs/go_module.md)  
-  - [JSON パッケージの勉強](./trainingJson)  
+  - [JSON パッケージの勉強](./docs/json_memo.md): [サンプル](./trainingJson)  
   - [VS Code in Container の設定](./.devcontainer/devcontainer.json)  
   - [GitHub の issue, pull Request の テンプレート作成](./.github)  
   - GitHub でリポジトリにタグをつける方法と リリースノートの自動生成  
+  - [http リクエスト の GET と POST](./docs/http_memo.md): [サンプル](./trainingWebScraping)  
 
 - ちょっとだけ練習した  
   - [Log パッケージの勉強](./docs/err_memo.md): [サンプル](./utils/util.go)  
@@ -33,6 +34,10 @@ Go 言語で様々なことをやってみる練習リポジトリ
 - [テキストファイルの中身を暗号化するツール](./fileCrypto/use.go)
   - パスワード, 入力ファイルの path, 出力ファイルの path は JSON ファイルに書いて 読み込ませる
   - ファイル, ターミナル I/O と crypto パッケージ
+- [PayPal の Sandbox 環境へリクエスト](./trainingWebScraping/paypal.go)
+  - ClientID と Secret を JSON ファイル から取得する
+  - ClientID と Secret で BASIC 認証を通して Access Token を取得する
+  - Access Token をリクエストヘッダーに含めて Client Token を取得する
 
 
 

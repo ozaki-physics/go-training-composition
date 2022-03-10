@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/ozaki-physics/go-training-composition/ddd01"
 	"github.com/ozaki-physics/go-training-composition/ddd02"
@@ -14,8 +16,8 @@ import (
 	"github.com/ozaki-physics/go-training-composition/trainingIo"
 	"github.com/ozaki-physics/go-training-composition/trainingJson"
 	"github.com/ozaki-physics/go-training-composition/trainingTimeZone"
+	"github.com/ozaki-physics/go-training-composition/trainingWebScraping"
 	"github.com/ozaki-physics/go-training-composition/utils"
-	"log"
 )
 
 // init システム的に main 関数の前に実行される初期化関数
@@ -36,6 +38,7 @@ func main() {
 	// mainAPIDDD02()
 	// mainEmbedding()
 	// mainGoTour()
+	mainWebScraping()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -134,6 +137,10 @@ func mainJson() {
 	utils.StartLog()
 	trainingJson.Example()
 	trainingJson.ReadJson01()
+	// trainingJson.ExampleTags()
+	// trainingJson.ExampleRawMessage()
+	// trainingJson.ExampleRawMessageMarshal()
+	// trainingJson.ExampleRawMessageUnmarshal()
 	utils.EndLog()
 }
 
@@ -163,4 +170,14 @@ func mainEmbedding() {
 
 func mainGoTour() {
 	goTour.Main()
+}
+
+func mainWebScraping() {
+	trainingWebScraping.Main()
+	// trainingWebScraping.TryGETURLParameter()
+	// trainingWebScraping.TryGET()
+	// trainingWebScraping.TryPOSTSimplePostForm()
+	// trainingWebScraping.TryPOST()
+	// accessToken := trainingWebScraping.GetPaypalAccessToken("./config/key.json")
+	// trainingWebScraping.GetPaypalClientToken(accessToken)
 }

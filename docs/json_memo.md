@@ -39,3 +39,7 @@ JSON を読み込むときに
 の違いはなんだろう  
 Unmarshal() は直接 JSON を取り込む感じがして UnmarshalJSON() は構造体に入れて 構造体を経由して操作する感じがある  
 [type RawMessage](https://pkg.go.dev/encoding/json@go1.17.8#RawMessage) を読んでもよく分からなかったし 結局 Unmarshal() を使っている感じだった  
+
+## インデントを整えて出力する方法
+`json.Indent()`
+[func Indent](https://pkg.go.dev/encoding/json@go1.17.8#Indent)

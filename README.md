@@ -27,18 +27,19 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - [Log パッケージの勉強](./docs/err_memo.md): [サンプル](./utils/util.go)  
   - [TimeZone パッケージの勉強](./trainingTimeZone)  
   - [godoc の書き方](./docs/godoc_memo.md)  
-  - [Go 言語の仕様](./docs/golang_memo.md)  
+  - [Go 言語の仕様](./docs/effective_go.md)  
 
 ### 作ったもの
 
 - [テキストファイルの中身を暗号化するツール](./fileCrypto/use.go)
   - パスワード, 入力ファイルの path, 出力ファイルの path は JSON ファイルに書いて 読み込ませる
   - ファイル, ターミナル I/O と crypto パッケージ
-- [PayPal の Sandbox 環境へリクエスト](./trainingWebScraping/paypal.go)
+- [PayPal の Sandbox 環境へリクエスト](./trainingWebScraping/paypal.go): [API ドキュメント(外部リンク)](https://developer.paypal.com/docs/checkout/advanced/integrate)
   - ClientID と Secret を JSON ファイル から取得する
   - ClientID と Secret で BASIC 認証を通して Access Token を取得する
   - Access Token をリクエストヘッダーに含めて Client Token を取得する
-
+- [GMO コインへリクエストして 暗号資産のレートを取得する](./trainingWebScraping/gmoCoin.go): [API ドキュメント(外部リンク)](https://api.coin.z.com/docs/#ticker)
+  - API 叩いて シンボル(BTC, ETH など12種)の情報(価格など)を JSON で取得する
 
 
 ## インストール方法 Install

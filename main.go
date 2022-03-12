@@ -38,7 +38,7 @@ func main() {
 	// mainAPIDDD02()
 	// mainEmbedding()
 	// mainGoTour()
-	mainWebScraping()
+	// mainWebScraping()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -173,11 +173,15 @@ func mainGoTour() {
 }
 
 func mainWebScraping() {
+	// 基本 無駄なリクエストが飛ばないようにコメントアウトしておく
 	trainingWebScraping.Main()
 	// trainingWebScraping.TryGETURLParameter()
 	// trainingWebScraping.TryGET()
 	// trainingWebScraping.TryPOSTSimplePostForm()
 	// trainingWebScraping.TryPOST()
+	// PayPal
 	// accessToken := trainingWebScraping.GetPaypalAccessToken("./config/key.json")
 	// trainingWebScraping.GetPaypalClientToken(accessToken)
+	// GMO コイン
+	// trainingWebScraping.GetGMOCoin()
 }

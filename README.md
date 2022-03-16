@@ -31,15 +31,17 @@ Go 言語で様々なことをやってみる練習リポジトリ
 
 ### 作ったもの
 
-- [テキストファイルの中身を暗号化するツール](./fileCrypto/use.go)
-  - パスワード, 入力ファイルの path, 出力ファイルの path は JSON ファイルに書いて 読み込ませる
-  - ファイル, ターミナル I/O と crypto パッケージ
-- [PayPal の Sandbox 環境へリクエスト](./trainingWebScraping/paypal.go): [API ドキュメント(外部リンク)](https://developer.paypal.com/docs/checkout/advanced/integrate)
-  - ClientID と Secret を JSON ファイル から取得する
-  - ClientID と Secret で BASIC 認証を通して Access Token を取得する
-  - Access Token をリクエストヘッダーに含めて Client Token を取得する
-- [GMO コインへリクエストして 暗号資産のレートを取得する](./trainingWebScraping/gmoCoin.go): [API ドキュメント(外部リンク)](https://api.coin.z.com/docs/#ticker)
-  - API 叩いて シンボル(BTC, ETH など12種)の情報(価格など)を JSON で取得する
+- [テキストファイルの中身を暗号化するツール](./fileCrypto/use.go)  
+  - パスワード, 入力ファイルの path, 出力ファイルの path は JSON ファイルに書いて 読み込ませる  
+  - ファイル, ターミナル I/O と crypto パッケージ  
+- [PayPal の Sandbox 環境へリクエスト](./trainingWebScraping/paypal.go): [API ドキュメント トップ(外部リンク)](https://developer.paypal.com/home/), [API ドキュメント(外部リンク)](https://developer.paypal.com/docs/checkout/advanced/integrate)  
+  - ClientID と Secret を JSON ファイル から取得する  
+  - ClientID と Secret で BASIC 認証を通して Access Token を取得する  
+  - Access Token をリクエストヘッダーに含めて Client Token を取得する  
+- [GMO コインへリクエストして 暗号資産のレートを取得する](./trainingWebScraping/gmoCoin.go): [API ドキュメント トップ(外部リンク)](https://api.coin.z.com/docs/#outline), [API ドキュメント(外部リンク)](https://api.coin.z.com/docs/#ticker)  
+  - API 叩いて シンボル(BTC, ETH など12種)の情報(価格など)を JSON で取得する  
+- [CoinMarketCap へリクエストして 暗号資産のレートを取得する](./docs/CoinMarketCap_api_memo.md): [サンプル](./trainingWebScraping), [API ドキュメント トップ(外部リンク)](https://coinmarketcap.com/api/), [API ドキュメント(外部リンク)](https://coinmarketcap.com/api/documentation/v1#section/Standards-and-Conventions)  
+  - API 叩いて シンボル(基本なんでも)の情報(価格など)を JSON で取得して構造体に格納する  
 
 
 ## インストール方法 Install

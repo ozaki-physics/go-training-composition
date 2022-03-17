@@ -1,0 +1,35 @@
+{
+  "status": {
+    "timestamp": "2022-03-13T13:29:00.876Z",
+    "error_code": 0,
+    "error_message": null,
+    "elapsed": 5,
+    "credit_count": 0,
+    "notice": null
+  },
+  "data": {
+    "plan": {
+      "credit_limit_daily": 333,
+      "credit_limit_daily_reset": "In 10 hours, 30 minutes",
+      "credit_limit_daily_reset_timestamp": "2022-03-14T00:00:00.000Z",
+      "credit_limit_monthly": 10000,
+      "credit_limit_monthly_reset": "In 18 days, 10 hours, 30 minutes",
+      "credit_limit_monthly_reset_timestamp": "2022-04-01T00:00:00.000Z",
+      "rate_limit_minute": 30
+    },
+    "usage": {
+      "current_minute": {
+        "requests_made": 0,
+        "requests_left": 30
+      },
+      "current_day": {
+        "credits_used": 13,
+        "credits_left": 320
+      },
+      "current_month": {
+        "credits_used": 26,
+        "credits_left": 9974
+      }
+    }
+  }
+}

@@ -189,3 +189,28 @@ Factory Method パターン と相性が悪い?
 
 ### Go 言語に三項演算子は存在しない
 コードカバレッジを計測するのが難しくなったり 5行を1行に圧縮できるメリットは 可読性等のデメリットを上回らない  
+
+### enum
+[Constants](https://go.dev/doc/effective_go#constants) に enum みたいな書き方が言及されていた  
+const で iota を使いつつ String() を定義して フォーマットを整えるらしい  
+[Go で Enum を定義するときのちょっとした気遣い](https://qiita.com/cia_rana/items/9d00ce81252ed970f362)  
+```go
+type Symbol int
+
+const (
+	_ Symbol = iota
+	BTC
+	ETH
+)
+
+func (s Symbol) String() string {
+	switch {
+	case s == BTC:
+		return fmt.Sprintf("%s", "BTC")
+	case s == ETH:
+		return fmt.Sprintf("%s", "ETH")
+	default:
+		return ""
+	}
+}
+```

@@ -11,6 +11,7 @@ import (
 	"github.com/ozaki-physics/go-training-composition/goTour"
 	"github.com/ozaki-physics/go-training-composition/package01"
 	"github.com/ozaki-physics/go-training-composition/package02"
+	"github.com/ozaki-physics/go-training-composition/requestCoinMarketCap"
 	"github.com/ozaki-physics/go-training-composition/trainingCrypto"
 	"github.com/ozaki-physics/go-training-composition/trainingEmbedding"
 	"github.com/ozaki-physics/go-training-composition/trainingIo"
@@ -38,7 +39,7 @@ func main() {
 	// mainAPIDDD02()
 	// mainEmbedding()
 	// mainGoTour()
-	mainWebScraping()
+	// mainWebScraping()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -141,6 +142,8 @@ func mainJson() {
 	// trainingJson.ExampleRawMessage()
 	// trainingJson.ExampleRawMessageMarshal()
 	// trainingJson.ExampleRawMessageUnmarshal()
+	// trainingJson.ExampleDynamicJSONParse()
+	// trainingJson.ExampleDynamicJSONParse02()
 	utils.EndLog()
 }
 
@@ -173,11 +176,25 @@ func mainGoTour() {
 }
 
 func mainWebScraping() {
+	// 基本 無駄なリクエストが飛ばないようにコメントアウトしておく
 	trainingWebScraping.Main()
 	// trainingWebScraping.TryGETURLParameter()
 	// trainingWebScraping.TryGET()
 	// trainingWebScraping.TryPOSTSimplePostForm()
 	// trainingWebScraping.TryPOST()
+
+	// PayPal
 	// accessToken := trainingWebScraping.GetPaypalAccessToken("./config/key.json")
 	// trainingWebScraping.GetPaypalClientToken(accessToken)
+
+	// GMO コイン
+	// trainingWebScraping.GetGMOCoin()
+
+	// CoinMarketCap
+	requestCoinMarketCap.CoinMarketCap_sample()
+	// c := requestCoinMarketCap.GetCredential("./config/key.json", false)
+	// c.GetKeyInfo()
+	// requestCoinMarketCap.ExampleSearchCMCID(&c)
+	// requestCoinMarketCap.ExampleGetMetadata(&c)
+	// requestCoinMarketCap.ExampleGetQuotesLatest(&c)
 }

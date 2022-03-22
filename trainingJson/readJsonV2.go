@@ -107,6 +107,7 @@ func ExampleRawMessageUnmarshal() {
 	}
 
 	for _, c := range colors {
+		// JSON の中の値に応じて 動的に struct を切り替えられる
 		var dst interface{}
 		switch c.Space {
 		case "RGB":

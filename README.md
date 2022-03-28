@@ -28,6 +28,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - [TimeZone パッケージの勉強](./trainingTimeZone)  
   - [godoc の書き方](./docs/godoc_memo.md)  
   - [Go 言語の仕様](./docs/effective_go.md)  
+  - [データ圧縮](./docs/compress_memo.md): [サンプル](./trainingCompress)  
 
 ### 作ったもの
 
@@ -40,7 +41,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - Access Token をリクエストヘッダーに含めて Client Token を取得する  
 - [GMO コインへリクエストして 暗号資産のレートを取得する](./trainingWebScraping/gmoCoin.go): [API ドキュメント トップ(外部リンク)](https://api.coin.z.com/docs/#outline), [API ドキュメント(外部リンク)](https://api.coin.z.com/docs/#ticker)  
   - API 叩いて シンボル(BTC, ETH など12種)の情報(価格など)を JSON で取得する  
-- [CoinMarketCap へリクエストして 暗号資産のレートを取得する](./docs/CoinMarketCap_api_memo.md): [サンプル](./trainingWebScraping), [API ドキュメント トップ(外部リンク)](https://coinmarketcap.com/api/), [API ドキュメント(外部リンク)](https://coinmarketcap.com/api/documentation/v1#section/Standards-and-Conventions)  
+- [CoinMarketCap へリクエストして 暗号資産のレートを取得する](./docs/CoinMarketCap_api_memo.md): [サンプル](./requestCoinMarketCap), [API ドキュメント トップ(外部リンク)](https://coinmarketcap.com/api/), [API ドキュメント(外部リンク)](https://coinmarketcap.com/api/documentation/v1#section/Standards-and-Conventions)  
   - API 叩いて シンボル(基本なんでも)の情報(価格など)を JSON で取得して構造体に格納する  
 
 

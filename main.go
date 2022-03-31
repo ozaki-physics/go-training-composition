@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ozaki-physics/go-training-composition/assetCalc"
 	"github.com/ozaki-physics/go-training-composition/ddd01"
 	"github.com/ozaki-physics/go-training-composition/ddd02"
 	"github.com/ozaki-physics/go-training-composition/fileCrypto"
@@ -12,6 +13,7 @@ import (
 	"github.com/ozaki-physics/go-training-composition/package01"
 	"github.com/ozaki-physics/go-training-composition/package02"
 	"github.com/ozaki-physics/go-training-composition/requestCoinMarketCap"
+	"github.com/ozaki-physics/go-training-composition/trainingCompress"
 	"github.com/ozaki-physics/go-training-composition/trainingCrypto"
 	"github.com/ozaki-physics/go-training-composition/trainingEmbedding"
 	"github.com/ozaki-physics/go-training-composition/trainingIo"
@@ -40,6 +42,9 @@ func main() {
 	// mainEmbedding()
 	// mainGoTour()
 	// mainWebScraping()
+	// mainRequestCoinMarketCap()
+	// maintrainingCompress()
+	// mainAssetCalc()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -189,12 +194,25 @@ func mainWebScraping() {
 
 	// GMO コイン
 	// trainingWebScraping.GetGMOCoin()
+}
 
+func mainRequestCoinMarketCap() {
 	// CoinMarketCap
-	requestCoinMarketCap.CoinMarketCap_sample()
-	// c := requestCoinMarketCap.GetCredential("./config/key.json", false)
+	// requestCoinMarketCap.CoinMarketCap_sample()
+	c := requestCoinMarketCap.GetCredential("./config/key.json", false)
 	// c.GetKeyInfo()
 	// requestCoinMarketCap.ExampleSearchCMCID(&c)
 	// requestCoinMarketCap.ExampleGetMetadata(&c)
-	// requestCoinMarketCap.ExampleGetQuotesLatest(&c)
+	requestCoinMarketCap.ExampleGetQuotesLatest(&c)
+}
+
+func maintrainingCompress() {
+	trainingCompress.NormalByte()
+	trainingCompress.MainDeflate()
+	trainingCompress.MainGzip()
+	trainingCompress.MainZlib()
+}
+
+func mainAssetCalc() {
+	assetCalc.Calc("all")
 }

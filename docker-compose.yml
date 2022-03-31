@@ -11,7 +11,7 @@ services:
       - .:/go/src/github.com/ozaki-physics/go-training-composition
       # コンテナ側は相対パス書けない
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:8088:8080"
     # docker-compose でマウントしたり, go run で動かしたり, build し直したり と開発用の操作が多いから
     # 自動でサーバ等動いてポートが埋まらないようにするため
     # コメントアウトしても image 作成時点のバイナリファイルが実行されることに注意

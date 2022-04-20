@@ -157,3 +157,122 @@ func (sh serverHandler) ServeHTTP(rw ResponseWriter, req *Request) {
 
 の `srv.Handler` が出てきたし ServeHTTP メソッド つまり Handler interface の実装が使われる部分が出てきた  
 つまり 自作した ServeHTTP(ResponseWriter, *Request) は ここで呼ばれて動作すると思われる  
+
+## `http.HandleFunc()` を調べる
+[func HandleFunc](https://pkg.go.dev/net/http?utm_source=gopls#HandleFunc) より  
+```go
+func HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
+	DefaultServeMux.HandleFunc(pattern, handler)
+}
+```
+>HandleFunc は、与えられたパターンに対応するハンドラ関数を DefaultServeMux に登録する。  
+>ServeMux のドキュメントでは、パターンがどのようにマッチングされるかを説明しています。  
+
+### `DefaultServeMux` を もう少し深く調べていく  
+[DefaultServeMux](https://pkg.go.dev/net/http#DefaultServeMux)  
+```go
+// DefaultServeMux is the default ServeMux used by Serve.
+var DefaultServeMux = &defaultServeMux
+
+var defaultServeMux ServeMux
+
+type ServeMux struct {
+	mu    sync.RWMutex
+	m     map[string]muxEntry
+	es    []muxEntry // slice of entries sorted from longest to shortest.
+	hosts bool       // whether any patterns contain hostnames
+}
+
+type muxEntry struct {
+	h       Handler
+	pattern string
+}
+```
+[type ServeMux](https://pkg.go.dev/net/http#ServeMux)  
+ServeMux の field は private なことに注意  
+>ServeMux は、 HTTP リクエストのマルチプレクサーです。
+>受信した各リクエストの URL を登録されたパターンのリストと照合し、その URL に最も近いパターンのハンドラを呼び出します。  
+>パターンは、"/favicon.ico"のような固定ルートパス、または"/images/"(末尾のスラッシュに注意)のようなルートサブツリーの名前を指定します。  
+>長いパターンは短いパターンよりも優先されます。  
+>たとえば、"/images/" と "/images/thumbnails/" の両方についてハンドラが登録されている場合、"/images/thumbnails/" で始まるパスについては後者のハンドラが呼ばれ、 "/images/" サブツリー内の他のパスについては前者がリクエストを受け取ります。  
+>スラッシュで終わるパターンはルート化されたサブツリーを指定するため、パターン"/"は Path == "/" のURLだけでなく、他の登録パターンにマッチしないすべてのパスにマッチすることに注意してください。  
+>サブツリーが登録されている場合に、末尾のスラッシュなしでサブツリー ルートを指定するリクエストを受信すると、 ServeMux はそのリクエストをサブツリー ルートにリダイレクトします(末尾のスラッシュを追加します)。  
+>この動作は、末尾のスラッシュを除いたパスに対する別の登録で上書きすることができます。たとえば、"/images/"を登録すると、"/images"が別途登録されていない限り、 ServeMux は"/images"への要求を"/images/"にリダイレクトします。  
+>パターンはオプションでホスト名で始めることができ、そのホスト上の URL のみにマッチを制限することができます。  
+>ホスト固有のパターンは一般的なパターンよりも優先されます。  
+>つまり、ハンドラは "/codesearch" と "codesearch.google.com/" という二つのパターンを登録することで、 "http://www.google.com/" に対するリクエストも引き受けることができるようになります。  
+>ServeMux は、 URL リクエストパスと Host ヘッダのサニタイズも行い、ポート番号を削除し、"."や"..要素"、繰り返されるスラッシュを含むリクエストは、同等のクリーンなURLにリダイレクトされます。  
+
+要約すると  
+pattern(url のこと) には rooted paths(ex. /favicon.ico) と rooted subtrees(ex. /images/) が登録できる  
+pattern は長いが優先される  
+"/images/" と "/images/thumbnails/" が登録されていて リクエストが "/images/thumbnails/" で始まるなら後者, "/images/なんとか" は前者が呼ばれる  
+pattern に "/" だけだと リクエストが "/" だけのものではなく 登録のないリクエストすべて が "/" を呼び出す  
+つまり "/images/" の登録がないのに リクエストが "/images/" なら "/" にリダイレクトされる感じ  
+また "/images/" の登録があるのに リクエストが "/images" なら "/images/" にリダイレクトする  
+
+ServeMux struct は4個のメソッドを持っている  
+- `func (mux *ServeMux) Handle(pattern string, handler Handler)`  
+  `DefaultServeMux.HandleFunc()` と一緒に調べる  
+- `func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Request))`  
+  `DefaultServeMux.HandleFunc()` と一緒に調べる  
+- `func (mux *ServeMux) Handler(r *Request) (h Handler, pattern string)`  
+  中で ServeMux の private メソッド `(mux *ServeMux) handler(host, path string) (h Handler, pattern string)` が呼ばれている  
+  `(mux *ServeMux) handler` で ServeMux の中に 存在する pattern を探して Handler を返す  
+- `func (mux *ServeMux) ServeHTTP(w ResponseWriter, r *Request)`  
+  中で `(mux *ServeMux) Handler()` を呼んでいる  
+
+
+ServeMux を自分で生成するメソッド [func NewServeMux() *ServeMux](https://pkg.go.dev/net/http#NewServeMux) もある  
+
+### `DefaultServeMux.HandleFunc()` を もう少し深く調べていく  
+[func (*ServeMux) HandleFunc](https://pkg.go.dev/net/http#ServeMux.HandleFunc) より  
+>HandleFunc は、与えられたパターンに対するハンドラ関数を登録する。  
+
+```go
+func (mux *ServeMux) HandleFunc(pattern string, handler func(ResponseWriter, *Request)) {
+	if handler == nil {
+		panic("http: nil handler")
+	}
+	mux.Handle(pattern, HandlerFunc(handler))
+}
+```
+HandlerFunc(handler) は ただ 型変換してる感じ  
+
+[func (*ServeMux) Handle](https://pkg.go.dev/net/http#ServeMux.Handle)
+>ハンドルは与えられたパターンに対応するハンドラを登録します。もし、pattern に対応するハンドラが既に存在する場合、Handle はパニックに陥ります。  
+
+```go
+func (mux *ServeMux) Handle(pattern string, handler Handler)
+```
+ServeMux の field m (型 map[string]muxEntry) に pattern と 呼び出しを登録するみたい  
+
+公式ドキュメントのサンプルには 以下が書かれていた  
+```go
+// apiHandler は ServeHTTP() を持つため Handler interface を実装したことになる
+type apiHandler struct{}
+func (apiHandler) ServeHTTP(http.ResponseWriter, *http.Request) {}
+
+func main() {
+	mux := http.NewServeMux()
+  // 以下2個の書き方は実質同じで struct を用意するか否かの違いだと思う
+	mux.Handle("/api/", apiHandler{})
+	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		// The "/" pattern matches everything, so we need to check
+		// that we're at the root here.
+		if req.URL.Path != "/" {
+			http.NotFound(w, req)
+			return
+		}
+		fmt.Fprintf(w, "Welcome to the home page!")
+	})
+}
+```
+
+## 軽く認識をまとめる
+go の server は ServeMux struct に登録された pattern と Handler interface によって リクエストが処理されている  
+そして 毎回 ServeMux を用意しなくていいように DefaultServeMux が存在する  
+`http.HandleFunc()` は DefaultServeMux に ハンドラを追加するメソッドであり  
+`http.ListenAndServe()` の第2引数を nil にすると DefaultServeMux が使われる  
+これで ルーティング の登録についてはなんとなく分かった  
+ただ 実際に 呼び出される処理はどうなっているんだろう  

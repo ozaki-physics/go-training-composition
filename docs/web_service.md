@@ -276,3 +276,68 @@ go の server は ServeMux struct に登録された pattern と Handler interfa
 `http.ListenAndServe()` の第2引数を nil にすると DefaultServeMux が使われる  
 これで ルーティング の登録についてはなんとなく分かった  
 ただ 実際に 呼び出される処理はどうなっているんだろう  
+
+## `http.FileServer()`を調べる(昔 調べたメモに書いてあったから統合する)
+[func FileServer](https://pkg.go.dev/net/http#FileServer) より  
+net/http/fs.go に書いてある  
+```go
+func FileServer(root FileSystem) Handler {
+	return &fileHandler{root}
+}
+```
+`Handler 型`を返す関数 つまり`ServeHTTP()`関数だけを持ち HTTP リクエストを受けてレスポンスを返すことができる  
+静的な web server として動作しそう  
+
+>FileServer は、root にルートされたファイルシステムの内容を HTTP リクエストに提供するハンドラを返す。  
+>特殊なケースとして、返されたファイルサーバーは "/index.html" で終わるいかなるリクエストも、最後の "index.html" を除いた同じパスにリダイレクトする。  
+>オペレーティングシステムのファイルシステム実装を使用するには、 http.Dir を使用します。  
+
+公式ドキュメントにあったサンプル
+```go
+func main() {
+	// Simple static webserver:
+	log.Fatal(http.ListenAndServe(":8080", http.FileServer(http.Dir("/usr/share/doc"))))
+}
+```
+
+### `fileHandler struct` をもう少し深く調べていく
+```go
+type fileHandler struct {
+	root FileSystem
+}
+type FileSystem interface {
+	Open(name string) (File, error)
+}
+type File interface {
+	io.Closer
+	io.Reader
+	io.Seeker
+	Readdir(count int) ([]fs.FileInfo, error)
+	Stat() (fs.FileInfo, error)
+}
+type Dir string
+```
+
+[type FileSystem](https://pkg.go.dev/net/http#FileSystem) より  
+>FileSystemは、名前付きファイルのコレクションへのアクセスを実装しています。ファイルパスの要素は、ホストのオペレーティングシステムの慣習に関係なく、スラッシュ ('/', U+002F) 文字で区切られます。  
+>FileSystem を Handler に変換するには、 FileServer 関数を参照してください。  
+>このインターフェースは fs.FS インターフェースよりも古いものであり、代わりに FS アダプタ関数が fs.FS を FileSystem に変換することができます。  
+
+[type File](https://pkg.go.dev/net/http#File) より  
+>FileSystem の Open メソッドから返され、 FileServer の実装によって提供される。  
+>メソッドは、 *os.File のメソッドと同じように動作する必要があります。  
+
+[type Dir](https://pkg.go.dev/net/http#Dir) より  
+>Dir は、特定のディレクトリツリーに限定されたネイティブファイルシステムを使用して FileSystem を実装しています。  
+> FileSystem.Open メソッドは '/' で区切られたパスを受け取りますが、Dir の文字列値は URL ではなくネイティブファイルシステム上のファイル名なので filepath.Separator で区切られており、必ずしも '/' とは限りません。  
+>Dir は機密性の高いファイルやディレクトリを公開する可能性があることに注意してください。  
+>Dir はディレクトリツリーの外を指すシンボリックリンクをたどります。  
+>これは、ユーザが任意のシンボリックリンクを作成できるようなディレクトリから 提供される場合、特に危険です。  
+>Dir はまた、ピリオドで始まるファイルやディレクトリへのアクセスを許可します。  
+>これは、.git のような機密ディレクトリや、.htpasswd のような機密ファイルを公開する可能性があります。  
+>ピリオドで始まるファイルを除外するには、そのファイル/ディレクトリをサーバーから削除するか、カスタム FileSystem の実装を作成してください。  
+>空の Dir は"."として扱われます。  
+
+つまり `FileServer()` のための基盤って感じがする  
+type Dir の適切な使い方は 今度勉強しよう  
+

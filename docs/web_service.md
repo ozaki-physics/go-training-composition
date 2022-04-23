@@ -341,3 +341,9 @@ type Dir string
 つまり `FileServer()` のための基盤って感じがする  
 type Dir の適切な使い方は 今度勉強しよう  
 
+## http メソッドによる 処理の振り分け
+[http の Constants](https://pkg.go.dev/net/http#pkg-constants) より  
+http.MethodGet などが存在する(net/http/method.go)  
+`http.Request.Method` を取り出して switch などで 定数(http.MethodGet など) 振り分ける  
+
+## ミドルウェア について

@@ -2,6 +2,7 @@ package webServer
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 )
@@ -19,3 +20,23 @@ func Main() {
 	// ListenAndServe() の第2引数が nil なら DefaultServeMux が Handler として指定される
 	http.ListenAndServe(":8080", nil)
 }
+
+// MainHtml 直接 html を固定値で配信する
+func MainHtml() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`
+			<html>
+				<head>
+					<title>go サーバー</title>
+				</head>
+				<body>
+					<h1>直接出力する</h1>
+				</body>
+			</html>
+		`))
+	})
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		log.Fatal("ListenAndServer:", err)
+	}
+}
+

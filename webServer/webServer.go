@@ -40,3 +40,14 @@ func MainHtml() {
 	}
 }
 
+// MainUrl path として "/" が特別なことを確認
+// "/" は URL が存在しない path でも とりあえず "/" に飛ばす
+func MainUrl() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Hello, World!")
+	})
+	http.HandleFunc("/img", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "image")
+	})
+	http.ListenAndServe(":8080", nil)
+}

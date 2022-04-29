@@ -92,3 +92,29 @@ func MiddlewareRoot() {
 	http.Handle("/", makeHandle)
 	http.ListenAndServe(":8080", nil)
 }
+
+func httpGet(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "GET メソッドのレスポンスだよ \n")
+}
+func httpPost(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "POST メソッドのレスポンスだよ \n")
+}
+
+func httpMethod(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	switch r.Method {
+	case http.MethodGet:
+		httpGet(w, r)
+	case http.MethodPost:
+		httpPost(w, r)
+	default:
+		fmt.Fprintln(w, "許可されたメソッドじゃないよ")
+	}
+}
+
+// MainHttpMethod http メソッドに応じて処理を分ける
+func MainHttpMethod() {
+	http.HandleFunc("/", httpMethod)
+	http.ListenAndServe(":8080", nil)
+}

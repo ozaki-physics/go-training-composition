@@ -581,3 +581,65 @@ func main() {
 ```
 ミドルウェアハンドラから return を発行することで、チェーンを介して伝播する制御を任意の時点で停止することができます。  
 
+## 静的ファイルの配信(テンプレートなし)
+```go
+	makeHandle := http.FileServer(http.Dir("web"))
+	http.Handle("/", makeHandle)
+```
+`http.Handle("/", http.FileServer(http.Dir("web")))` で web ディレクトリ内の静的ファイルを配信できる  
+URL は web ディレクトリが ルート URL になる  
+http://localhost:8088/hello.html アクセスできる  
+http://localhost:8088/sub/hello.html アクセスできない  
+http://localhost:8088/sub/sub01.html アクセスできる  
+http://localhost:8088/sub/sub/sub01.html アクセスできない  
+
+プレフィックスをつけてみる  
+```go
+	makeHandle01 := http.StripPrefix("/sub/", makeHandle)
+	http.Handle("/", makeHandle01)
+```
+http://localhost:8088/hello.html アクセスできない  
+http://localhost:8088/sub/hello.html アクセスできる  
+http://localhost:8088/sub/sub01.html アクセスできない  
+http://localhost:8088/sub/sub/sub01.html アクセスできる  
+`http.StripPrefix("/sub/", makeHandle)` をすると ルート URL に 引数01番目 を追加した URL が web ディレクトリと つながるっぽい  
+http.StripPrefix で プレフィックスって言ってるぐらいだから URL に 接頭辞が付く  
+
+受け付けるパスを変えてみる  
+```go
+	makeHandle01 := http.StripPrefix("/sub/", makeHandle)
+	http.Handle("/aaa/", makeHandle01)
+```
+http://localhost:8088/hello.html アクセスできない  
+http://localhost:8088/sub/hello.html アクセスできない  
+http://localhost:8088/sub/sub01.html アクセスできない  
+http://localhost:8088/sub/sub/sub01.html アクセスできない  
+
+http://localhost:8088/aaa/hello.html アクセスできない  
+http://localhost:8088/aaa/sub/hello.html アクセスできない  
+http://localhost:8088/sub/aaa/hello.html アクセスできない  
+
+http://localhost:8088/aaa/sub01.html アクセスできない  
+http://localhost:8088/aaa/sub/sub01.html アクセスできない  
+http://localhost:8088/aaa/sub/sub/sub01.html アクセスできない  
+まず サーバが /aaa をついてないとリッスンしてない  
+また /aaa をつけても /aaa ディレクトリなんて存在しないから すべてアクセスできないと思われる  
+
+プレフィックスを変えてみる  
+```go
+	makeHandle01 := http.StripPrefix("/aaa/", makeHandle)
+	http.Handle("/aaa/", makeHandle01)
+```
+http://localhost:8088/hello.html アクセスできない  
+http://localhost:8088/sub/hello.html アクセスできない  
+http://localhost:8088/sub/sub01.html アクセスできない  
+http://localhost:8088/sub/sub/sub01.html アクセスできない  
+
+http://localhost:8088/aaa/hello.html アクセスできる  
+http://localhost:8088/aaa/sub/hello.html アクセスできない  
+http://localhost:8088/sub/aaa/hello.html アクセスできない  
+
+http://localhost:8088/aaa/sub01.html アクセスできない  
+http://localhost:8088/aaa/sub/sub01.html アクセスできる  
+http://localhost:8088/aaa/sub/sub/sub01.html アクセスできない  
+プレフィックスに /aaa をつけたので URL に /aaa があったら web ディレクトリにつながるようになったと思われる  

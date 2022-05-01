@@ -118,3 +118,27 @@ func MainHttpMethod() {
 	http.HandleFunc("/", httpMethod)
 	http.ListenAndServe(":8080", nil)
 }
+
+// MainFileServer 静的ファイルを配信
+// http://localhost:8080/ だと web/index.html
+// http://localhost:8080/hello.html だと web/hello.html
+func MainFileServer() {
+	fileHandler := http.FileServer(http.Dir("web"))
+	makeHandle := middlewareOne(fileHandler)
+	http.Handle("/", makeHandle)
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Fatal("ListenAndServer:", err)
+	}
+}
+
+// MainFileServer02 フォルダ階層を省略して URL と対応させる
+func MainFileServer02() {
+	makeHandle := http.FileServer(http.Dir("web"))
+	// makeHandle := http.FileServer(http.Dir("web/sub"))
+	// makeHandle = http.StripPrefix("/sub/", makeHandle)
+	makeHandle = http.StripPrefix("/aaa/", makeHandle)
+	// http.Handle("/", makeHandle)
+	http.Handle("/aaa/", makeHandle)
+	http.ListenAndServe(":8080", nil)
+}

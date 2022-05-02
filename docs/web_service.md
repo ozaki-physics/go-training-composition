@@ -643,3 +643,185 @@ http://localhost:8088/aaa/sub01.html アクセスできない
 http://localhost:8088/aaa/sub/sub01.html アクセスできる  
 http://localhost:8088/aaa/sub/sub/sub01.html アクセスできない  
 プレフィックスに /aaa をつけたので URL に /aaa があったら web ディレクトリにつながるようになったと思われる  
+
+## go のサーバを https にする方法(TLS)
+### https に関する基礎知識
+https は HTTP over SSL/TLS のこと
+SSL(Secure Sockets Layer) とは インターネット上で データを暗号化して送受信するプロトコル  
+TLS(Transport Layer Security) とは SSL の後継規格  
+今は 全部 TLS になっており SSL は使ってはならないことになっている  
+2021/03/xx には TLS 1.1 も非推奨になっている  
+2015年あたりまでは SSL だったため 俗に SSL/TLS という両方書きが普及しているらしい  
+つまり https にすると インターネット上の通信が暗号化される  
+
+TLS のシーケンス  
+1. サーバーは公開鍵の正当性を証明するために、認証局に登録申請を行う  
+2. 認証局がサーバーに対して、デジタル証明書を発行する  
+3. クライアントがサーバーに接続すると、サーバは認証局の署名付き証明書を返信する  
+4. クライアントは証明書が本物であることを確認する  
+5. クライアントは乱数を発生させ、サーバの公開鍵で暗号化してサーバーに送る  
+  この乱数は実際にHTTP通信を行う際の鍵を作ることに利用される。  
+6. サーバーは秘密鍵で、暗号化された乱数を復号する。  
+7. サーバとクライアントで共通鍵を使って暗号化通信を行う。  
+  サーバとクライアントの双方で、マスターシークレット(MS)と呼ばれる鍵を生成し、この MS から生成した共通鍵を使って暗号化通信を行う。  
+  サーバーとクライアントが実際のデータの送受信を行う際には、共通鍵暗号を利用する。  
+  このとき、この乱数から2種類の鍵を生成し、"クライアント -> サーバ"と"サーバ -> クライアント"で異なる鍵を用いる。  
+
+https 通信であっても盗み見される情報  
+- CONNECT メソッドのホスト情報  
+  https がプロキシ経由で通信する際、例えば https://www.yahoo.co.jp と通信するクライアントは、プロキシに対して "CONNECT www.yahoo.co.jp" というメソッドを平文で発行しますので、これを盗み見すれば宛先情報が分かります。  
+- デジタル証明書のサブジェクト代替名/コモンネーム  
+  https のセッション開始時 (暗号化通信が始まる前) の "Certificate" メッセージではサーバがデジタル証明書を提示しますが、そのデジタル証明書には サブジェクト代替名 (SANs) という URL のホスト情報が含まれています。  
+  これを盗み見することでやはり宛先情報が分かります。  
+- Client Hello の ServerName Extension  
+  Extension には通信先サーバの URL 情報が載せられています。  
+  元々は https を使うバーチャルホストへの対応のため (HTTP GET の前に URL が分かっていないと、対応した証明書を提示できず TLS コネクションが開始できないため) に考えられましたが、中間の NW 機器 (主に UTM) 等が宛先を認識して制御する目的でもよく使われます。  
+
+参考:  
+[SSL/TLSについて調べたことまとめ](https://qiita.com/Takatoshi_Hiki/items/d98a2d7f52708eac5324)  
+[【図解】https(SSL/TLS)の仕組みとシーケンス,パケット構造 〜暗号化の範囲, Encrypted Alert, ヘッダやレイヤについて～](https://milestone-of-se.nesuke.com/nw-basic/tls/https-structure/)  
+
+### 実際に go のコードを見る
+[func ListenAndServeTLS](https://pkg.go.dev/net/http#ListenAndServeTLS) より  
+```go
+func ListenAndServeTLS(addr, certFile, keyFile string, handler Handler) error {
+	server := &Server{Addr: addr, Handler: handler}
+	return server.ListenAndServeTLS(certFile, keyFile)
+}
+```
+>ListenAndServeTLS は、 HTTPS 接続を必要とする以外は、 ListenAndServe と同じように動作します。  
+>さらに、サーバーの証明書と一致する秘密鍵を含むファイルを提供する必要があります。  
+>証明書が認証局によって署名されている場合、 certFile はサーバーの証明書、任意の中間体、およびCAの証明書を連結したものである必要があります。  
+
+サンプル  
+```go
+func main() {
+	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		io.WriteString(w, "Hello, TLS!\n")
+	})
+
+	// One can use generate_cert.go in crypto/tls to generate cert.pem and key.pem.
+  // crypto/tls の generate_cert.go を使って cert.pem と key.pem を生成することができます。
+	log.Printf("About to listen on 8443. Go to https://127.0.0.1:8443/")
+	err := http.ListenAndServeTLS(":8443", "cert.pem", "key.pem", nil)
+	log.Fatal(err)
+}
+```
+サンプル見ても分かるように公開鍵と秘密鍵をサーバ(Mux)に設定する必要があるっぽい  
+中身としては DefaultServeMux の代わりとなる Mux を作って `(srv *Server) ListenAndServeTLS()` を呼んでいる  
+
+コメントに書いてある [crypto/tls の generate_cert.go](https://github.com/golang/go/blob/master/src/crypto/tls/generate_cert.go) は main パッケージ かつ build ignore している  
+つまり `go run $(go env GOROOT)/src/crypto/tls/generate_cert.go --host=localhost` と使う  
+`curl --cacert webServer/sample_cert.pem https://localhost:8088` でアクセスできた  
+http では `Client sent an HTTP request to an HTTPS server` と言われ ちゃんと https サーバだからダメだよって言われた
+
+[crypto/tls](https://pkg.go.dev/crypto/tls) に [Example (HttpServer)](https://pkg.go.dev/crypto/tls#example-X509KeyPair-HttpServer) があった  
+```go
+func main() {
+	certPem := []byte(`-----BEGIN CERTIFICATE-----
+MIIBhTCCASugAwIBAgIQIRi6zePL6mKjOipn+dNuaTAKBggqhkjOPQQDAjASMRAw
+DgYDVQQKEwdBY21lIENvMB4XDTE3MTAyMDE5NDMwNloXDTE4MTAyMDE5NDMwNlow
+EjEQMA4GA1UEChMHQWNtZSBDbzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABD0d
+7VNhbWvZLWPuj/RtHFjvtJBEwOkhbN/BnnE8rnZR8+sbwnc/KhCk3FhnpHZnQz7B
+5aETbbIgmuvewdjvSBSjYzBhMA4GA1UdDwEB/wQEAwICpDATBgNVHSUEDDAKBggr
+BgEFBQcDATAPBgNVHRMBAf8EBTADAQH/MCkGA1UdEQQiMCCCDmxvY2FsaG9zdDo1
+NDUzgg4xMjcuMC4wLjE6NTQ1MzAKBggqhkjOPQQDAgNIADBFAiEA2zpJEPQyz6/l
+Wf86aX6PepsntZv2GYlA5UpabfT2EZICICpJ5h/iI+i341gBmLiAFQOyTDT+/wQc
+6MF9+Yw1Yy0t
+-----END CERTIFICATE-----`)
+	keyPem := []byte(`-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIIrYSSNQFaA2Hwf1duRSxKtLYX5CB04fSeQ6tF1aY/PuoAoGCCqGSM49
+AwEHoUQDQgAEPR3tU2Fta9ktY+6P9G0cWO+0kETA6SFs38GecTyudlHz6xvCdz8q
+EKTcWGekdmdDPsHloRNtsiCa697B2O9IFA==
+-----END EC PRIVATE KEY-----`)
+	cert, err := tls.X509KeyPair(certPem, keyPem)
+	if err != nil {
+		log.Fatal(err)
+	}
+	cfg := &tls.Config{Certificates: []tls.Certificate{cert}}
+	srv := &http.Server{
+		TLSConfig:    cfg,
+		ReadTimeout:  time.Minute,
+		WriteTimeout: time.Minute,
+	}
+	log.Fatal(srv.ListenAndServeTLS("", ""))
+}
+```
+
+`tls.X509KeyPair()` の戻り値が tls.Certificate 型 になっている  
+`http.Server.TLSConfig` に tls.Config 型 で 渡す必要があるから  
+tls.Config の中に 戻り値(tls.Certificate 型)を入れ込む  
+`var b []int = []int{1,2,3}` と定義するのと同様に 要素数1で tls.Config.Certificates に入れる  
+
+### `(srv *Server) ListenAndServeTLS()` をもう少し深く調べていく
+[func (*Server) ListenAndServeTLS](https://pkg.go.dev/net/http#Server.ListenAndServeTLS) より  
+```go
+func (srv *Server) ListenAndServeTLS(certFile, keyFile string) error {
+	if srv.shuttingDown() {
+		return ErrServerClosed
+	}
+	addr := srv.Addr
+	if addr == "" {
+		addr = ":https"
+	}
+
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		return err
+	}
+
+	defer ln.Close()
+
+	return srv.ServeTLS(ln, certFile, keyFile)
+}
+```
+
+>ListenAndServeTLS は、 TCP ネットワークアドレス srv.Addr でリッスンし、 ServeTLS を呼び出して受信する TLS 接続のリクエストを処理します。  
+>受け入れられた接続は、 TCP キープアライブを有効にするように構成されます。  
+>サーバーの  TLSConfig.Certificates または TLSConfig.GetCertificate のいずれも入力されていない場合、サーバーの証明書と一致する秘密鍵を含むファイル名を提供する必要があります。  
+>証明書が認証局によって署名されている場合、 certFile は、サーバーの証明書、任意の中間体、および CA の証明書を連結したものでなければなりません。  
+
+このメソッドは `http.ListenAndServeTLS()` の中から呼ばれてるし crypto/tls の Example (HttpServer) でも呼ばれてる  
+ただ pem キーの渡すタイミングが違う  
+crypto/tls の Example (HttpServer) では Mux に入れてる  
+http.ListenAndServeTLS() では 引数で渡している  
+結局 どこに pem キーが存在すればいいの?  
+
+### `(srv *Server) ServeTLS()` をもう少し深く調べていく
+[func (*Server) ServeTLS](https://pkg.go.dev/net/http#Server.ServeTLS) より  
+```go
+func (srv *Server) ServeTLS(l net.Listener, certFile, keyFile string) error {
+	// 一部抜粋
+	config := cloneTLSConfig(srv.TLSConfig)
+
+	if !configHasCert || certFile != "" || keyFile != "" {
+		var err error
+		config.Certificates = make([]tls.Certificate, 1)
+		config.Certificates[0], err = tls.LoadX509KeyPair(certFile, keyFile)
+	}
+
+	tlsListener := tls.NewListener(l, config)
+	return srv.Serve(tlsListener)
+}
+```
+
+>ServeTLS は、 Listener lで着信接続を受け付け、それぞれに新しいサービスゴルーチンを生成します。  
+>サービスゴルーチンは TLS のセットアップを行い、リクエストを読み、 srv.Handler を呼び出して返信します。  
+>サーバーの TLSConfig.Certificates と TLSConfig.GetCertificate のいずれにも値が入力されていない場合、サーバーの証明書と一致する秘密鍵の入ったファイルを提供しなければならない。  
+>証明書が認証局によって署名されている場合、 certFile は、サーバーの証明書、任意の中間体、およびCAの証明書を連結したものである必要があります。  
+
+結局 keyFile は `tls.LoadX509KeyPair()` に渡されている  
+そして `tls.LoadX509KeyPair()` から `tls.X509KeyPair()` に渡されているし `cloneTLSConfig()` は tls.Config 型を返すので  
+結局 tls.Config の中に tls.Certificate 型 を入れ込む ことになり crypto/tls の Example (HttpServer) と同じ流れになった  
+よって pem キーは Mux の中に存在しないとダメと思われる  
+
+また `srv.Serve(tlsListener)` と http と同じ処理(`(srv *Server) Serve(l net.Listener)` つまり `server.ListenAndServe()`)にもなっている  
+
+参考:  
+[Go言語と暗号技術（AESからTLS）](https://deeeet.com/writing/2015/11/10/go-crypto/)  
+- [TLSを使ったサーバとクライアントの実装例](https://github.com/tcnksm/go-crypto/tree/master/tls)  
+- [httpsのサーバ実装例](https://github.com/tcnksm/go-crypto/blob/master/https/server.go)  
+
+また クライアントから https 通信するときも何かしら設定がいる?  
+- [httpsのクライアント実装例](https://github.com/tcnksm/go-crypto/blob/master/https/client.go)  
+

@@ -142,3 +142,54 @@ func MainFileServer02() {
 	http.Handle("/aaa/", makeHandle)
 	http.ListenAndServe(":8080", nil)
 }
+
+// MainTlsPattern01 https 通信のサンプル
+// See: [crypto/tls の Example (HttpServer)](https://pkg.go.dev/crypto/tls#example-X509KeyPair-HttpServer)
+// なんか使い方がよく分からない
+func MainTlsPattern01() {
+	certPem := []byte(`-----BEGIN CERTIFICATE-----
+MIIBhTCCASugAwIBAgIQIRi6zePL6mKjOipn+dNuaTAKBggqhkjOPQQDAjASMRAw
+DgYDVQQKEwdBY21lIENvMB4XDTE3MTAyMDE5NDMwNloXDTE4MTAyMDE5NDMwNlow
+EjEQMA4GA1UEChMHQWNtZSBDbzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABD0d
+7VNhbWvZLWPuj/RtHFjvtJBEwOkhbN/BnnE8rnZR8+sbwnc/KhCk3FhnpHZnQz7B
+5aETbbIgmuvewdjvSBSjYzBhMA4GA1UdDwEB/wQEAwICpDATBgNVHSUEDDAKBggr
+BgEFBQcDATAPBgNVHRMBAf8EBTADAQH/MCkGA1UdEQQiMCCCDmxvY2FsaG9zdDo1
+NDUzgg4xMjcuMC4wLjE6NTQ1MzAKBggqhkjOPQQDAgNIADBFAiEA2zpJEPQyz6/l
+Wf86aX6PepsntZv2GYlA5UpabfT2EZICICpJ5h/iI+i341gBmLiAFQOyTDT+/wQc
+6MF9+Yw1Yy0t
+-----END CERTIFICATE-----`)
+
+	keyPem := []byte(`-----BEGIN EC PRIVATE KEY-----
+MHcCAQEEIIrYSSNQFaA2Hwf1duRSxKtLYX5CB04fSeQ6tF1aY/PuoAoGCCqGSM49
+AwEHoUQDQgAEPR3tU2Fta9ktY+6P9G0cWO+0kETA6SFs38GecTyudlHz6xvCdz8q
+EKTcWGekdmdDPsHloRNtsiCa697B2O9IFA==
+-----END EC PRIVATE KEY-----`)
+
+	cert, err := tls.X509KeyPair(certPem, keyPem)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	cfg := &tls.Config{Certificates: []tls.Certificate{cert}}
+	srv := &http.Server{
+		TLSConfig:    cfg,
+		ReadTimeout:  time.Minute,
+		WriteTimeout: time.Minute,
+	}
+	log.Fatal(srv.ListenAndServeTLS("", ""))
+}
+
+// MainTlsPattern02 https 通信のサンプルの改造
+// See: [func ListenAndServeTLS() の Example](https://pkg.go.dev/net/http#example-ListenAndServeTLS)
+// go run $(go env GOROOT)/src/crypto/tls/generate_cert.go --host=localhost で pem たちを生成した
+// curl --cacert webServer/sample_cert.pem https://localhost:8088
+func MainTlsPattern02() {
+	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		fmt.Fprintf(w, "Hello, TLS!\n")
+	})
+
+	err := http.ListenAndServeTLS(":8080", "webServer/sample_cert.pem", "webServer/sample_key.pem", nil)
+	if err != nil {
+		log.Fatal("ListenAndServer:", err)
+	}
+}

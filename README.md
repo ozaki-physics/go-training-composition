@@ -22,6 +22,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - [GitHub の issue, pull Request の テンプレート作成](./.github)  
   - GitHub でリポジトリにタグをつける方法と リリースノートの自動生成  
   - [http リクエスト の GET と POST](./docs/http_memo.md): [サンプル](./trainingWebScraping)  
+  - [Server を立てる](./docs/web_service.md): [サンプル](./webServer/webServer.go)  
 
 - ちょっとだけ練習した  
   - [Log パッケージの勉強](./docs/err_memo.md): [サンプル](./utils/util.go)  
@@ -55,27 +56,37 @@ VS Code の拡張機能 Remote - Containers(識別子: ms-vscode-remote.remote-c
 コンテナ内で VS Code を起動し go 言語のための VS Code の拡張機能 Go(識別子: golang.go) を使う  
 [golang.go](https://marketplace.visualstudio.com/items?itemName=golang.Go)  
 
-golang.go は 様々なモジュールをインストールする必要がある  
-そのモジュールを Docker image に含めないようにするため  
-コンテナを起動した後の コンテナ内 VS Code で変更を加える  
-VS Code の通知より install All をする  
-
-コンテナに変更を加えたため 基本は コンテナ削除をしない  
-(削除した場合は 再度 install All をすればいいだけ)  
+golang.go を使うために 様々なパッケージをインストールする必要がある  
+開発用の パッケージを Docker image に含めないようにするために  
+コンテナを起動した後の コンテナ内 VS Code でインストールする  
+VS Code の通知より install All をする(補完だけでいいなら gopls だけインストールでも良さそう)  
 
 コンテナ内の git では日本語が使えないため コミットするときは ローカルの git bash 等を使う  
 ```bash
 $ docker-compose build
-$ docker-compose up -d
 # VS Code より Remote - Containers で接続する
 # たまに .devcontainer\devcontainer.json の差分を検知して rebuild するような通知が来る
 # その時は docker image も作り直されて 古い方の image が <none> になるため削除する
 
-# VS Code より Remote - Containers で接続する
 # VS Code の通知(golang.go)より install All をする
+# 補完だけでいいなら 通知より gopls を install する
+# (.devcontainer\devcontainer.json に自動で gopls だけはインストールするようにしてあるから すぐ終わるはず)
 
 # 基本は VS Code 内のターミナルで良いが ローカルの PowerShell からアクセスしたくなった場合
 $ docker-compose exec go_training bash
+
+# 終えるとき
+# VS Code より Remote - Containers で接続をやめる
+$ docker-compose down
+```
+
+ちょっと前までは コンテナを落とさない運用を考えていた  
+でも最近は コンテナも削除している  
+一応コンテナを落とさない手順も書いておく  
+```bash
+# VS Code より Remote - Containers で接続する前に
+$ docker-compose up -d
+# VS Code より Remote - Containers で接続する
 
 # 終えるとき
 # VS Code より Remote - Containers で接続をやめる
@@ -86,38 +97,43 @@ $ docker-compose start
 ```
 
 ちなみに image の時点で go build は済んでおり  
-image から直接 run または docker-compose.yml の command をコメントアウトで確認できる  
+image から直接 run または docker-compose.yml の command をコメントアウトで build でコンパイルした go の コードが実行できる  
 ```bash
 $ docker container run --rm -d -p 8080:8080 --name check_go_training go1.17:training_composition_vscode_in_container
 $ docker container stop check_go_training
 ```
 
+最初に go のパッケージ管理ファイル go.mod を生成するコマンド  
 ```bash
 /go/src/github.com/ozaki-physics/go-training-composition# go mod init $REPOSITORY
 ```
 
-### 外部モジュールのバージョンアップ
+### 外部パッケージのバージョンアップ
 例として github.com/gin-gonic/gin をバージョンアップする  
 1. コンテナにアタッチする
-2. モジュールのバージョンアップして go.mod を更新する
+2. パッケージのバージョンアップして go.mod を更新する
 3. コンテナを削除してもバージョンアップが反映されるように docker image を作り直す
 
 ```bash
 $ docker-compose up -d
 $ docker-compose exec go_training bash
 
-# モジュールのバージョンアップ
+# パッケージをインストールするときは go install が推奨(go get は非推奨)
+# でもエラーで go get を使えと言われることもある
+# go mod tidy を実行すると自動で整理してくれる
+
+# パッケージのバージョンアップ
 /go/src/github.com/ozaki-physics/go-training-composition# go get -d -v -u github.com/gin-gonic/gin
-# 不要モジュールの削除
+# 不要パッケージの削除
 /go/src/github.com/ozaki-physics/go-training-composition# go mod tidy -v
 
 $ docker-compose down
 $ docker image rm go1.17:training_composition_vscode_in_container
-# docker image の作り直し
+# docker image の作り直し(Dockerfile で go.mod を元にインストールするような記述があるから)
 $ docker-compose build
 ```
 
-### golang.go でインストールされるモジュール
+### golang.go でインストールされるパッケージ
 - Installing github.com/uudashr/gopkgs/v2/cmd/gopkgs (/go/bin/gopkgs) SUCCEEDED  
 [gopkgs](https://github.com/uudashr/gopkgs)  
 インポートできるパッケージのリストを表示するツール  

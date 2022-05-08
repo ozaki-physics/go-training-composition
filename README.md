@@ -11,6 +11,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - ターミナル I/O の勉強: [サンプル](./trainingIo/ioTerminal.go)  
   - レイヤードアーキテクチャの勉強: [サンプル01](./ddd01), [サンプル02](./ddd02)  
   - [Go 言語でのテスト方法](./docs/test_memo.md): [サンプル](./pkg03), [テスト駆動開発 書籍の要約](./docs/tdd_summary.md), [サンプル](./trainingTest)  
+  - [Server を立てる](./docs/web_service.md): [サンプル](./webServer/webServer.go)  
 
 
 - ふつうに練習した  
@@ -22,7 +23,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - [GitHub の issue, pull Request の テンプレート作成](./.github)  
   - GitHub でリポジトリにタグをつける方法と リリースノートの自動生成  
   - [http リクエスト の GET と POST](./docs/http_memo.md): [サンプル](./trainingWebScraping)  
-  - [Server を立てる](./docs/web_service.md): [サンプル](./webServer/webServer.go)  
+  - [template について](./docs/web_template.md): [サンプル](./webServer/webTemplate.go)  
 
 - ちょっとだけ練習した  
   - [Log パッケージの勉強](./docs/err_memo.md): [サンプル](./utils/util.go)  
@@ -30,6 +31,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - [godoc の書き方](./docs/godoc_memo.md)  
   - [Go 言語の仕様](./docs/effective_go.md)  
   - [データ圧縮](./docs/compress_memo.md): [サンプル](./trainingCompress)  
+  - [1度だけの実行](docs/once_memo.md)
 
 ### 作ったもの
 

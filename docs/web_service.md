@@ -644,18 +644,6 @@ http://localhost:8088/aaa/sub/sub01.html アクセスできる
 http://localhost:8088/aaa/sub/sub/sub01.html アクセスできない  
 プレフィックスに /aaa をつけたので URL に /aaa があったら web ディレクトリにつながるようになったと思われる  
 
-## 静的ファイルの配信(テンプレートあり)
-テンプレートを使うと 汎用的なテキストの中に 固有のテキストを埋め込むことができる  
-html に go から変数を渡して レスポンスすることができる  
-そのためテンプレートを利用するのが一般的  
-Go 標準パッケージに テキスト向けの `text/template` と html 向けの `html/template` がある  
-`html/template` だと挿入するコンテキストに 不正なスクリプトの確認, URLで使用できない文字をエンコードすること が可能  
-テンプレートを使う場合はテンプレートのコンパイルが必要  
-テンプレートのコンパイルとは テンプレートを解釈してデータを埋め込める状態にすること  
-
-テンプレートの `{{` と `}}` で囲まれた部分はアノテーション(注釈, 目印)を表していて データを埋め込む場所と値を示す  
-`{{.Host}}` なら `Template.Execute(w, data)` より `data.Host` の値で置換される  
-
 ## go のサーバを https にする方法(TLS)
 ### https に関する基礎知識
 https は HTTP over SSL/TLS のこと
@@ -837,3 +825,11 @@ func (srv *Server) ServeTLS(l net.Listener, certFile, keyFile string) error {
 また クライアントから https 通信するときも何かしら設定がいる?  
 - [httpsのクライアント実装例](https://github.com/tcnksm/go-crypto/blob/master/https/client.go)  
 
+## 軽く気になったこと
+いつドメインの設定をするんだろう  
+-> DNS 解決だからサーバには無理  
+-> サーバはただのIPアドレスしか無く IP アドレスは好きに設定できるわけでないから  
+-> ただ go で DNS サーバも作ることはできるっぽい  
+
+フツーに使ってたら 毎回 localhost:8080 になる  
+-> Server struct の Addr フィールド に 8080 を渡しているから  

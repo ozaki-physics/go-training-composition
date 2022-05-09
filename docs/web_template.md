@@ -148,3 +148,165 @@ func (t *Template) execute(wr io.Writer, data interface{}) (err error) {
 
 実際にテンプレートに値を埋め込むメソッドと思われる  
 
+## テンプレート構文
+### [Overview](https://pkg.go.dev/text/template#pkg-overview) より  
+
+>テンプレートの入力テキストは，UTF-8でエンコードされた任意の形式のテキストである．  
+>アクション（データ評価または制御構造）は、"{{"と"}}"で区切られ、アクション以外のすべてのテキストは変更されずに出力にコピーされます。  
+>生の文字列を除いて、アクションは改行をまたぐことはできませんが、コメントは可能です。  
+
+### [Text and spaces](https://pkg.go.dev/text/template#hdr-Text_and_spaces) より  
+
+>テンプレートのソースコードを整形するために、アクションの左のデリミタ(デフォルトでは"{{")の直後に マイナス記号と空白が続く場合、直前のテキストからすべての後続の空白が切り取られます。  
+>同様に、右のデリミタ("}}")の前に空白とマイナス記号がある場合、直後のテキストからすべての先行する空白が切り取られる。  
+>これらのトリムマーカーでは、ホワイトスペースが存在しなければならない。  
+>"{{- 3}}" は "{{3}}" のようですが、直前のテキストを切り捨てます。  
+>一方 "{{-3}}" は数字の -3 を含むアクションとして解析されます。  
+
+delimiter(デリミタ)は 区切り文字のこと  
+`"{{23 -}} < {{- 45}}"` は `"23<45"` になる  
+
+>このトリミングでは、空白文字の定義は Go と同じで、スペース、水平タブ、キャリッジリターン、ニューラインである。  
+
+### [Actions(アクション)](https://pkg.go.dev/text/template#hdr-Actions) より  
+>以下はアクションの一覧である。"引数 "と "パイプライン "はデータの評価で、詳細はこの後の対応するセクションで定義されます。
+
+```
+コメントの書き方, コメント中には改行を使うことができる
+{{/* a comment */}}
+
+前後の空白を削除したコメント
+{{- /* a comment with white space trimmed from preceding and following text */ -}}
+
+デフォルトのテキスト, パイプラインのデフォルトテキストで使える
+{{pipeline}}
+
+if 文
+パイプラインの値が空(false, 0, nil など)なら if の内側は実行されない
+{{if pipeline}} T1 {{end}}
+{{if pipeline}} T1 {{else}} T0 {{end}}
+{{if pipeline}} T1 {{else if pipeline}} T0 {{end}}
+
+for 文
+パイプラインの値は 配列, スライス, マップ, チャネル でないといけない
+値が0なら else にいく
+{{range pipeline}} T1 {{end}}
+{{range pipeline}} T1 {{else}} T0 {{end}}
+
+{{range pipeline}} を制御する構文
+{{break}}
+{{continue}}
+
+指定された名前のテンプレートが、nil データで実行される
+{{template "name"}}
+
+指定された名前のテンプレートを実行します
+指定された名前のテンプレートが、パイプラインの値にドットセット をパイプラインの値に設定して実行されます
+{{template "name" pipeline}}
+
+ブロックは、テンプレートを定義するための略記法
+{{define "name"}} T1 {{end}} を定義し、その場 {{template "name" pipeline}} を実行します
+{{block "name" pipeline}} T1 {{end}}
+
+if 文と似ている? 使い分けがちょっと分からない
+{{with pipeline}} T1 {{end}}
+{{with pipeline}} T1 {{else}} T0 {{end}}
+```
+
+template の中に if 文なども書けるみたい  
+php や jsp に近いため 乱用するとカオスコードになりそうだから乱用しすぎない方がいいかも  
+
+### [Arguments(引数)](https://pkg.go.dev/text/template#hdr-Arguments) より  
+
+>引数は単純な値であり、以下のいずれかで示される。  
+
+真偽値, 文字列, 文字, 整数, 浮動小数, 虚数, 複素数  
+. は その時(range, with, 渡された struct そのまま, map そのまま)の値
+変数は "$" から始まる英数字の文字  
+struct なら ".field"  
+マップ なら ".key"  
+".method" もできる  
+
+### [Pipelines(パイプライン)](https://pkg.go.dev/text/template#hdr-Pipelines) より  
+
+>パイプラインは、連鎖する可能性のある一連の「コマンド」です。  
+>コマンドは単純な値（引数）、または関数やメソッドの呼び出しであり、複数の引数を持つこともあります。  
+
+>パイプラインは、一連のコマンドをパイプライン文字'|'で区切ることによって「連鎖」させることができます。  
+>連鎖したパイプラインでは、各コマンドの結果は、次のコマンドの最後の引数として渡されます。  
+
+### [Variables(変数)](https://pkg.go.dev/text/template#hdr-Variables) より  
+
+>$variable := pipeline
+
+Examples  
+すべて output と出力される  
+```
+{{"\"output\""}}
+	文字列の定数
+{{`"output"`}}
+	生の文字列の定数
+{{printf "%q" "output"}}
+	関数の呼び出し
+{{"output" | printf "%q"}}
+	最終引数が前のコマンドから来た関数呼び出し。コマンドから来る関数呼び出し。
+{{printf "%q" (print "out" "put")}}
+	括弧でくくられた引数。
+{{"put" | printf "%s%s" "out" | printf "%q"}}
+	もっと凝った呼び方。
+{{"output" | printf "%s" | printf "%q"}}
+	もっと長いチェーン。
+{{with "output"}}{{printf "%q" .}}{{end}}
+	ドットを使ったwithアクション。
+{{with $x := "output" | printf "%q"}}{{$x}}{{end}}
+	変数を作成・使用するwithアクション。
+{{with $x := "output"}}{{printf "%q" $x}}{{end}}
+	変数を他のアクションで使用するwithアクション。
+{{with $x := "output"}}{{$x | printf "%q"}}{{end}}
+	同じですが、パイプライン化されています。
+```
+
+### [Functions(関数)](https://pkg.go.dev/text/template#hdr-Functions) より  
+
+>実行中の関数は、2つの関数マップに格納されます。  
+>デフォルトでは、テンプレートに関数は定義されていませんが、 Funcs メソッドを使用して関数を追加することができます。  
+>定義済みのグローバル関数の名前は以下の通りです  
+
+```
+and
+call
+html: 引数のテキスト表現をエスケープしたHTMLを返す。 html/template では基本使えない
+index
+slice
+js: 引数のテキスト表現をエスケープしたJavaScriptを返します。
+len
+not
+or
+print: fmt.Sprint の alias
+printf: fmt.Sprintf の alias
+println: fmt.Sprintln の alias
+urlquery: URL クエリを埋め込むのに適した形 html/template では基本使えない
+eq: ==
+ne: !=
+lt: <
+le: <=
+gt: >
+ge: >=
+```
+
+### [Nested template definitions(ネストしたテンプレート定義)](https://pkg.go.dev/text/template#hdr-Nested_template_definitions) より  
+
+>あるテンプレートを解析するとき、別のテンプレートが定義され、解析中のテンプレートに関連付けられることがあります。  
+>テンプレートの定義は、Goプログラムにおけるグローバル変数のように、テンプレートのトップレベルに表示されなければなりません。  
+> このような定義の構文は、各テンプレート宣言を "define "と "end "アクションで囲むことです。  
+
+```
+const text =`
+{{define "T1"}}ONE{{end}}
+{{define "T2"}}TWO{{end}}
+{{define "T3"}}{{template "T1"}} {{template "T2"}}{{end}}
+{{template "T3"}}
+`
+
+出力: ONE TWO
+```

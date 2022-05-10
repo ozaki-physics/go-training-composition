@@ -310,3 +310,80 @@ const text =`
 
 出力: ONE TWO
 ```
+
+## サンプル
+[text/template にあったサンプル](https://pkg.go.dev/text/template#example-Template)  
+
+[html/template にあったサンプル](https://pkg.go.dev/html/template#example-package)  
+
+### テンプレートの一部共通化
+```
+{{/* テンプレートを入れ子にする */ -}}
+{{define "T1"}}ONE{{end}}
+{{define "T2"}}TWO{{end}}
+{{define "T3"}}{{template "T1"}} {{template "T2"}}{{end}}
+{{template "T3"}}
+```
+を使う  
+
+3ファイル用意して読み込む  
+```go
+type d struct {
+	Header struct {
+		Title    string
+		UserName string
+	}
+	Message string
+}
+
+t := h_template.Must(h_template.ParseFiles(
+	"web/template03.html",
+	"web/template03_header.html",
+	"web/template03_footer.html",
+))
+t.Execute(w, d)
+```
+読み込む順番は 一番上が大元になる テンプレートじゃないとダメ  
+
+web/template03.html  
+```html
+{{template "header" .}}
+  <p>{{.Message}}</p>
+{{template "footer"}}
+```
+web/template03_header.html  
+```html
+{{define "header"}}
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>{{.Header.Title}}</title>
+</head>
+
+<body>
+  <h1>{{.Header.Title}}</h1>
+  <p>ようこそ {{.Header.UserName}} さん!</p>
+{{end}}
+```
+web/template03_footer.html  
+```html
+{{define "footer"}}
+<div>フッター</div>
+</body>
+
+</html>
+{{end}}
+```
+
+web/template03.html での `{{ . }}` は `d struct` そのものだから  
+web/template03_header.html で Title などの値を取り出すときは `{{ .Header.Title }}` と書く必要がある  
+冗長でイヤなら `{{template "header" .}}` で `d struct` ごとではなく `d.Header` で渡す  
+つまり `{{template "header" .Header}}` にすれば `{{ .Title }}` で値が取り出せるようになる  
+
+### 参考文献
+[Go言語(golang) テンプレートの使い方](https://golang.hateblo.jp/entry/golang-text-html-template)  
+[Goのテンプレートをちゃんと使ってみる](https://qiita.com/rock619/items/925575c2878b131a16b5)  
+[Go の html/template でヘッダーやフッター等の共通化を実現する方法](https://mikan.github.io/2019/12/08/implementing-header-and-footer-with-golang-html-template/)
+

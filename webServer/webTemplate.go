@@ -4,6 +4,7 @@ import (
 	h_template "html/template"
 	"log"
 	"net/http"
+	"os"
 	t_template "text/template"
 )
 
@@ -22,6 +23,112 @@ func SampleFirstTextTemplate() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+// SampleTextTemplate 公式リファレンスのサンプルのちょっと改造
+// See: [text/template にあったサンプル](https://pkg.go.dev/text/template#example-Template) より
+func SampleTextTemplate() {
+	// Define a template.
+	const letter = `
+親愛なる {{.Name}},
+
+{{if .Attended}}
+結婚式でお会いできて嬉しかったです。
+{{- else}}
+結婚式に来れなくて残念です。
+{{- end}}
+
+{{with .Gift -}}
+素敵な {{.}} をありがとうございました。
+{{end}}
+
+よろしくお願いします。
+ジョシー
+`
+
+	// Prepare some data to insert into the template.
+	// テンプレートに挿入するデータを用意する。
+	type Recipient struct {
+		Name, Gift string
+		Attended   bool // 出席
+	}
+	// Recipient 受取人
+	var recipients = []Recipient{
+		{"ミルドレッドおばさん", "bone china tea set", true},
+		{"ジョン叔父さん", "moleskin pants", false},
+		{"いとこのロドニー", "", false},
+	}
+
+	// Create a new template and parse the letter into it.
+	// 新しいテンプレートを作成し、そのテンプレートに手紙を解析します。
+	t := t_template.Must(t_template.New("letter").Parse(letter))
+
+	// Execute the template for each recipient.
+	// 宛先ごとにテンプレートを実行します。
+	for _, r := range recipients {
+		// とりあえずコンソールに出力する
+		err := t.Execute(os.Stdout, r)
+		if err != nil {
+			log.Println("executing template:", err)
+		}
+	}
+}
+
+// SampleHtmlTemplate 公式リファレンスのサンプルのちょっと改造
+// See: [html/template にあったサンプル](https://pkg.go.dev/html/template#example-package) より
+func SampleHtmlTemplate() {
+	const tpl = `
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>{{.Title}}</title>
+	</head>
+	<body>
+		{{- range .Items}}
+			<div>{{ . }}</div>
+		{{- else}}
+			<div>行なし</div>
+		{{- end}}
+	</body>
+</html>
+`
+
+	check := func(err error) {
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	t, err := h_template.New("webpage").Parse(tpl)
+	check(err)
+
+	type base struct {
+		Title string
+		Items []string
+	}
+
+	// 1ページ目
+	data := base{
+		Title: "1ページ目",
+		Items: []string{
+			"写真",
+			"ブログ",
+		},
+	}
+
+	// とりあえずコンソールに出力する
+	err = t.Execute(os.Stdout, data)
+	check(err)
+
+	// 2ページ目
+	noItems := base{
+		Title: "2ページ目",
+		Items: []string{},
+	}
+
+	// とりあえずコンソールに出力する
+	err = t.Execute(os.Stdout, noItems)
+	check(err)
 }
 
 // textTemplate ServeHTTP() メソッドを持つための struct

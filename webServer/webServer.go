@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"text/template"
 	"time"
 )
 
@@ -191,37 +190,6 @@ func MainTlsPattern02() {
 	})
 
 	err := http.ListenAndServeTLS(":8080", "webServer/sample_cert.pem", "webServer/sample_key.pem", nil)
-	if err != nil {
-		log.Fatal("ListenAndServer:", err)
-	}
-}
-
-// template01 ServeHTTP() メソッドを持つための struct
-type template01 struct {
-	fileName string             // ファイル名の格納
-	data     interface{}        // html に埋め込む値の構造体
-	templ    *template.Template // templ コンパイルされたテンプレートの参照を保持
-}
-
-// ServeHTTP http.Handle() の引数に渡すため
-func (t *template01) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	t.templ = template.Must(template.ParseFiles(t.fileName))
-	// テンプレートをコンパイル(値の埋め込み など)
-	t.templ.Execute(w, t.data)
-}
-
-// MainTemplateText
-func MainTemplateText() {
-	// html に渡す値たち
-	// field は public じゃないと html に埋め込めない
-	type data struct {
-		Age int
-	}
-	d := data{Age: 25}
-
-	t := &template01{fileName: "web/template01.html", data: d}
-	http.Handle("/template01.html", t)
-	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		log.Fatal("ListenAndServer:", err)
 	}

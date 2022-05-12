@@ -25,6 +25,77 @@ func SampleFirstTextTemplate() {
 	}
 }
 
+// SampleTextTemplateSpaces 空白のトリミングを試す
+func SampleTextTemplateSpaces() {
+	tmpl01, _ := t_template.New("test").Parse("{{23 -}} < {{- 45}}\n")
+	tmpl01.Execute(os.Stdout, "")
+	// "23<45" と出力される
+
+	tmpl02, _ := t_template.New("test").Parse("hello {{- 23 -}} < {{ 45 -}} world\n")
+	tmpl02.Execute(os.Stdout, "")
+	// "hello23< 45world" と出力される
+}
+
+// data テンプレートでメソッドが使えるか試すため
+type data struct {
+	Name string
+	Age  int
+}
+
+// AgePlus5 テンプレートでメソッドが使えるか試す
+func (d data) AgePlus5() int {
+	return d.Age + 5
+}
+
+// SampleTextTemplateAction 構文を試す
+func SampleTextTemplateAction() {
+	const text = `
+hello
+{{- /* コメント */ -}}
+world
+
+{{/* output と出力するバリエーション */ -}}
+{{"output" | printf "%q"}}
+{{with $x := "output"}}{{$x | printf "%q"}}{{end}}
+
+{{/* テンプレートを入れ子にする */ -}}
+{{define "T1"}}ONE{{end}}
+{{define "T2"}}TWO{{end}}
+{{define "T3"}}{{template "T1"}} {{template "T2"}}{{end}}
+{{template "T3"}}
+
+{{/* スライスを受け取って for 文回す */ -}}
+{{ range . }}
+{{ .Name }}: {{ .Age }}
+{{ end }}
+
+{{/* スライスの特定要素を取り出す */ -}}
+{{ index . 0 }}
+{{ (index . 2).Name }}
+
+{{/* テンプレートでメソッドが使えるか */ -}}
+{{ (index . 1).AgePlus5 }}
+`
+
+	d := []data{
+		{
+			Name: "aaa",
+			Age:  10,
+		},
+		{
+			Name: "bbb",
+			Age:  20,
+		},
+		{
+			Name: "ccc",
+			Age:  30,
+		},
+	}
+
+	tmpl01, _ := t_template.New("test").Parse(text)
+	tmpl01.Execute(os.Stdout, d)
+}
+
 // SampleTextTemplate 公式リファレンスのサンプルのちょっと改造
 // See: [text/template にあったサンプル](https://pkg.go.dev/text/template#example-Template) より
 func SampleTextTemplate() {
@@ -240,4 +311,34 @@ func MainTemplateInjection() {
 	if err != nil {
 		log.Fatal("ListenAndServer:", err)
 	}
+}
+
+// MainTemplateComponent テンプレートの一部共通化を試す
+func MainTemplateComponent() {
+	http.HandleFunc("/template-component", func(w http.ResponseWriter, r *http.Request) {
+		d := struct {
+			Header struct {
+				Title    string
+				UserName string
+			}
+			Message string
+		}{
+			Header: struct {
+				Title    string
+				UserName string
+			}{
+				Title:    "テストページ",
+				UserName: "ゲスト",
+			},
+			Message: "こんにちは",
+		}
+		t := h_template.Must(h_template.ParseFiles(
+			"web/template03.html",
+			"web/template03_header.html",
+			"web/template03_footer.html",
+		))
+		t.Execute(w, d)
+	})
+
+	http.ListenAndServe(":8080", nil)
 }

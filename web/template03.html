@@ -1,0 +1,7 @@
+{{template "header" .}}
+{{/* web/template03_header.html で
+  .Header.UserName と書かずに .UserName と書くためには
+  template "header" . から template "header" .Header と 書き直す必要がある
+*/}}
+  <p>{{.Message}}</p>
+{{template "footer"}}

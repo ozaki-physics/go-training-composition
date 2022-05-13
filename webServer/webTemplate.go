@@ -1,6 +1,7 @@
 package webServer
 
 import (
+	"fmt"
 	h_template "html/template"
 	"log"
 	"net/http"
@@ -200,6 +201,48 @@ func SampleHtmlTemplate() {
 	// とりあえずコンソールに出力する
 	err = t.Execute(os.Stdout, noItems)
 	check(err)
+}
+
+// SampleHtmlTemplateAutoescaping 公式リファレンスのサンプルのちょっと改造
+// html/template にすると script タグがちゃんとエスケープされる確認
+// See: [html/template にあったサンプル](https://pkg.go.dev/html/template#example-package-Autoescaping) より
+func SampleHtmlTemplateAutoescaping() {
+	const text = `{{define "T"}}
+Hello, {{.}}!
+{{end}}`
+	t, _ := h_template.New("foo").Parse(text)
+	t.ExecuteTemplate(os.Stdout, "T", "<script>alert('アラートだよ')</script>")
+}
+
+// SampleHtmlTemplateEscape 公式リファレンスのサンプルのちょっと改造
+// いろいろなエスケープ方法
+// See: [html/template にあったサンプル](https://pkg.go.dev/html/template#example-package-Escape) より
+func SampleHtmlTemplateEscape() {
+	const s = `"フラン & フレディー's ダイナー" <tasty@example.com>`
+	v := []interface{}{`"フラン & フレディー's ダイナー"`, ' ', `<tasty@example.com>`}
+
+	fmt.Print("-1-: ")
+	fmt.Println(h_template.HTMLEscapeString(s))
+
+	fmt.Print("-2-: ")
+	h_template.HTMLEscape(os.Stdout, []byte(s))
+	fmt.Fprintln(os.Stdout, "")
+
+	fmt.Print("-3-: ")
+	fmt.Println(h_template.HTMLEscaper(v...))
+
+	fmt.Print("-4-: ")
+	fmt.Println(h_template.JSEscapeString(s))
+
+	fmt.Print("-5-: ")
+	h_template.JSEscape(os.Stdout, []byte(s))
+	fmt.Fprintln(os.Stdout, "")
+
+	fmt.Print("-6-: ")
+	fmt.Println(h_template.JSEscaper(v...))
+
+	fmt.Print("-7-: ")
+	fmt.Println(h_template.URLQueryEscaper(v...))
 }
 
 // textTemplate ServeHTTP() メソッドを持つための struct

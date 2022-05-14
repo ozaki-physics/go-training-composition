@@ -387,3 +387,27 @@ web/template03_header.html で Title などの値を取り出すときは `{{ .H
 [Goのテンプレートをちゃんと使ってみる](https://qiita.com/rock619/items/925575c2878b131a16b5)  
 [Go の html/template でヘッダーやフッター等の共通化を実現する方法](https://mikan.github.io/2019/12/08/implementing-header-and-footer-with-golang-html-template/)
 
+## テンプレートのコンパイルを1回にする
+リクエストごとに処理を行うメソッドで テンプレートファイルを読み込むのは効率が良くない気がする  
+よって テンプレートのコンパイルは 1回だけ実行する方が効率的と思われる  
+`sync.Once.Do()` を使うことで 複数の goroutine から `ServeHTTP()` メソッドを呼び出されてもコンパイルは1回しか実行しないことを保証する  
+
+また `ServeHTTP()` メソッドの中でテンプレートをコンパイルすると 必要になるまで処理を後回しにできる  
+このことを 遅延初期化(lazy initialization)という  
+めったに呼ばれない処理の中で遅延初期化が使われているとエラーに気づかないという問題もある  
+
+良い使い方は分からないが 一例として  
+```go
+type onceTemplate struct {
+	fileName string               // ファイル名の格納
+	once     sync.Once            // コンパイルするために使う
+	templ    *h_template.Template // templ コンパイルされたテンプレートの参照を保持
+}
+
+func (t *onceTemplate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	t.once.Do(func() {
+		t.templ = template.Must(template.ParseFiles(t.fileName))
+	})
+	t.templ.Execute(w, t.data)
+}
+```

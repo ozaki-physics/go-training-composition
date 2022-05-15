@@ -21,6 +21,7 @@ import (
 	"github.com/ozaki-physics/go-training-composition/trainingTimeZone"
 	"github.com/ozaki-physics/go-training-composition/trainingWebScraping"
 	"github.com/ozaki-physics/go-training-composition/utils"
+	"github.com/ozaki-physics/go-training-composition/webServer"
 )
 
 // init システム的に main 関数の前に実行される初期化関数
@@ -45,6 +46,7 @@ func main() {
 	// mainRequestCoinMarketCap()
 	// maintrainingCompress()
 	// mainAssetCalc()
+	// mainWebServer()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -215,4 +217,28 @@ func maintrainingCompress() {
 
 func mainAssetCalc() {
 	assetCalc.Calc("all")
+}
+
+func mainWebServer() {
+	// webServer.Main()
+	// webServer.MainHtml()
+	// webServer.MainUrl()
+	// webServer.MiddlewareRoot()
+	// webServer.MainHttpMethod()
+	// webServer.MainFileServer()
+	// webServer.MainFileServer02()
+	// webServer.MainTlsPattern01()
+	// webServer.MainTlsPattern02()
+	// webServer.SampleFirstTextTemplate()
+	// webServer.SampleTextTemplateSpaces()
+	// webServer.SampleTextTemplateAction()
+	// webServer.SampleTextTemplate()
+	// webServer.SampleHtmlTemplate()
+	// webServer.SampleHtmlTemplateAutoescaping()
+	// webServer.SampleHtmlTemplateEscape()
+	// webServer.MainTextTemplateServer()
+	// webServer.MainHtmlTemplateServer()
+	// webServer.MainTemplateInjection()
+	// webServer.MainTemplateComponent()
+	// webServer.MainOnceTemplate()
 }

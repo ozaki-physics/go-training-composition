@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 	t_template "text/template"
 )
 
@@ -384,4 +385,46 @@ func MainTemplateComponent() {
 	})
 
 	http.ListenAndServe(":8080", nil)
+}
+
+// onceTemplate テンプレートのコンパイルを1回だけにする
+type onceTemplate struct {
+	fileName string               // ファイル名の格納
+	data     interface{}          // テンプレートに埋め込む値
+	once     sync.Once            // コンパイルするために使う
+	templ    *h_template.Template // templ コンパイルされたテンプレートの参照を保持
+}
+
+// ServeHTTP http のため インタフェースを実装する
+// sync.Once の値は常に同じものを使う必要があるため レシーバがポインタである必要がある
+func (t *onceTemplate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// 1回だけ実行する
+	t.once.Do(func() {
+		// ディレクトリの書き方が このファイルからの path ではなく 実行している場所(main.go など)からの path じゃないと動かない
+		t.templ = h_template.Must(h_template.ParseFiles(t.fileName))
+	})
+	// 値をテンプレートに埋め込む
+	err := t.templ.Execute(w, t.data)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+// MainOnceTemplate テンプレートのコンパイルを1回だけのパターン
+func MainOnceTemplate() {
+	// ここで URL に対応する http.Handler を DefaultServeMux に登録
+	http.Handle("/once", &onceTemplate{
+		fileName: "web/template02.html",
+		data: data{
+			Name: "ozaki",
+			Age:  26,
+		},
+	})
+
+	// Web サーバを開始
+	// ListenAndServe() の第2引数が nil なら DefaultServeMux が Handler として指定される
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		log.Println(err)
+	}
 }

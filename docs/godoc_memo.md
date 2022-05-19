@@ -138,6 +138,8 @@ package sample
 他にも Example を書くための それ用のメソッドを作って `// Output` って書くと `go test` でテストが実行できるらしい
 __また今後 元気があるときに調べよう__
 
+go 言語の中身を見ると godoc が 70字以内で書かれているの美しいな
+
 ## 公式も `godoc` ツールを使っているみたい
 公式ドキュメントのブログ[Godoc: documenting Go code](https://go.dev/blog/godoc)で
 >we have developed the godoc documentation tool.

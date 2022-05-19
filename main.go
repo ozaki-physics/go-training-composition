@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ozaki-physics/go-training-composition/assetCalc"
 	"github.com/ozaki-physics/go-training-composition/ddd01"
 	"github.com/ozaki-physics/go-training-composition/ddd02"
 	"github.com/ozaki-physics/go-training-composition/fileCrypto"
@@ -12,6 +13,7 @@ import (
 	"github.com/ozaki-physics/go-training-composition/package01"
 	"github.com/ozaki-physics/go-training-composition/package02"
 	"github.com/ozaki-physics/go-training-composition/requestCoinMarketCap"
+	"github.com/ozaki-physics/go-training-composition/trainingCompress"
 	"github.com/ozaki-physics/go-training-composition/trainingCrypto"
 	"github.com/ozaki-physics/go-training-composition/trainingEmbedding"
 	"github.com/ozaki-physics/go-training-composition/trainingIo"
@@ -19,6 +21,7 @@ import (
 	"github.com/ozaki-physics/go-training-composition/trainingTimeZone"
 	"github.com/ozaki-physics/go-training-composition/trainingWebScraping"
 	"github.com/ozaki-physics/go-training-composition/utils"
+	"github.com/ozaki-physics/go-training-composition/webServer"
 )
 
 // init システム的に main 関数の前に実行される初期化関数
@@ -40,6 +43,10 @@ func main() {
 	// mainEmbedding()
 	// mainGoTour()
 	// mainWebScraping()
+	// mainRequestCoinMarketCap()
+	// maintrainingCompress()
+	// mainAssetCalc()
+	// mainWebServer()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -189,12 +196,49 @@ func mainWebScraping() {
 
 	// GMO コイン
 	// trainingWebScraping.GetGMOCoin()
+}
 
+func mainRequestCoinMarketCap() {
 	// CoinMarketCap
-	requestCoinMarketCap.CoinMarketCap_sample()
-	// c := requestCoinMarketCap.GetCredential("./config/key.json", false)
+	// requestCoinMarketCap.CoinMarketCap_sample()
+	c := requestCoinMarketCap.GetCredential("./config/key.json", false)
 	// c.GetKeyInfo()
 	// requestCoinMarketCap.ExampleSearchCMCID(&c)
 	// requestCoinMarketCap.ExampleGetMetadata(&c)
-	// requestCoinMarketCap.ExampleGetQuotesLatest(&c)
+	requestCoinMarketCap.ExampleGetQuotesLatest(&c)
+}
+
+func maintrainingCompress() {
+	trainingCompress.NormalByte()
+	trainingCompress.MainDeflate()
+	trainingCompress.MainGzip()
+	trainingCompress.MainZlib()
+}
+
+func mainAssetCalc() {
+	assetCalc.Calc("all")
+}
+
+func mainWebServer() {
+	// webServer.Main()
+	// webServer.MainHtml()
+	// webServer.MainUrl()
+	// webServer.MiddlewareRoot()
+	// webServer.MainHttpMethod()
+	// webServer.MainFileServer()
+	// webServer.MainFileServer02()
+	// webServer.MainTlsPattern01()
+	// webServer.MainTlsPattern02()
+	// webServer.SampleFirstTextTemplate()
+	// webServer.SampleTextTemplateSpaces()
+	// webServer.SampleTextTemplateAction()
+	// webServer.SampleTextTemplate()
+	// webServer.SampleHtmlTemplate()
+	// webServer.SampleHtmlTemplateAutoescaping()
+	// webServer.SampleHtmlTemplateEscape()
+	// webServer.MainTextTemplateServer()
+	// webServer.MainHtmlTemplateServer()
+	// webServer.MainTemplateInjection()
+	// webServer.MainTemplateComponent()
+	// webServer.MainOnceTemplate()
 }

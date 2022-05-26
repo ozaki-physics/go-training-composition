@@ -24,6 +24,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - GitHub でリポジトリにタグをつける方法と リリースノートの自動生成  
   - [http リクエスト の GET と POST](./docs/http_memo.md): [サンプル](./trainingWebScraping)  
   - [template について](./docs/web_template.md): [サンプル](./webServer/webTemplate.go)  
+  - [cookie について](./docs/web_cookie.md): [サンプル](./webServer/webCookie.go)  
 
 - ちょっとだけ練習した  
   - [Log パッケージの勉強](./docs/err_memo.md): [サンプル](./utils/util.go)  
@@ -31,7 +32,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - [godoc の書き方](./docs/godoc_memo.md)  
   - [Go 言語の仕様](./docs/effective_go.md)  
   - [データ圧縮](./docs/compress_memo.md): [サンプル](./trainingCompress)  
-  - [1度だけの実行](docs/once_memo.md)
+  - [1度だけの実行](./docs/once_memo.md)  
 
 ### 作ったもの
 

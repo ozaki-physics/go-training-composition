@@ -121,3 +121,28 @@ Cookie ドメインとスキームが現在のページと一致していない�
 [SameSite Cookie の説明](https://web.dev/i18n/ja/samesite-cookies-explained/)  
 [HTTP クッキーをより安全にする SameSite 属性について (Same-site Cookies)](https://laboradian.com/same-site-cookies/)  
 
+## Go で Cookie を扱う
+Go を サーバにアクセスするクライアントとして使うときの Cookie と  
+Go を サーバとして扱うときの Cookie があることを意識する  
+
+`&http.Cookie` の struct を作って Cookie の属性とかを struct に入れて  
+`http.SetCookie(w, cookie01)` で ブラウザに Cookie が保存される  
+
+ブラウザから送信されてきた Cookie を取得するには `cookie01, err := r.Cookie("Cookie の key 名")`  
+`http.Cookie` sturct が取得できる  
+
+すべての Cookie をまとめて取得したいときは `r.Cookies()`  
+### 参考文献
+[Go言語でCookieを操作する(設定と取得)](https://qiita.com/Sekky0905/items/f4cad4cacf5872df001e)  
+[Goで学ぶCookie操作(設定・送信・取得)まとめ](https://mintaku-blog.net/go-cookie/)  
+
+## http の cookie と http/cookiejar の違い
+cookiejar は Response に Cookie あれば 一旦保持して 次回以降の Request に その Cookie を付加して送信してくれるらしい  
+Go を サーバにアクセスするクライアントとしてみたときに便利そう  
+一旦放置でいいかも  
+### 参考文献
+[Go言語(golang) HTTPリクエスト](https://golang.hateblo.jp/entry/golang-http-request)  
+
+## ちょっと気になったこと
+go でリダイレクトする方法は?
+`http.Redirect(writer, request, "/", 302)` でいいの?

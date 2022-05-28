@@ -220,7 +220,7 @@ func mainAssetCalc() {
 }
 
 func mainWebServer() {
-	// webServer.Main()
+	webServer.Main()
 	// webServer.MainHtml()
 	// webServer.MainUrl()
 	// webServer.MiddlewareRoot()
@@ -241,4 +241,5 @@ func mainWebServer() {
 	// webServer.MainTemplateInjection()
 	// webServer.MainTemplateComponent()
 	// webServer.MainOnceTemplate()
+	// webServer.MainCookie()
 }

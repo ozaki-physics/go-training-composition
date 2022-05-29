@@ -33,6 +33,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - [Go 言語の仕様](./docs/effective_go.md)  
   - [データ圧縮](./docs/compress_memo.md): [サンプル](./trainingCompress)  
   - [1度だけの実行](./docs/once_memo.md)  
+  - [http のテストコード](./docs/web_test.md): [サンプル](./webServer/webTest.go)  
 
 ### 作ったもの
 

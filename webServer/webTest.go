@@ -3,6 +3,7 @@ package webServer
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/http/httptest"
 )
@@ -29,3 +30,25 @@ func TryResponseRecorder() {
 	fmt.Println(resp.Header.Get("Content-Type"))
 	fmt.Println(string(body))
 }
+
+// TryServer
+// See: https://pkg.go.dev/net/http/httptest#example-Server
+func TryServer() {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Hello, client")
+	}))
+	defer ts.Close()
+
+	res, err := http.Get(ts.URL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	greeting, err := io.ReadAll(res.Body)
+	res.Body.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%s\n", greeting)
+}
+

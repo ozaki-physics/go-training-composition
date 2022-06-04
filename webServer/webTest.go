@@ -3,7 +3,6 @@ package webServer
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/http/httptest"
 )
@@ -12,48 +11,47 @@ func TryTestServer(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "hello world !")
 }
 
-// TryResponseRecorder
+// TryResponseRecorder 公式ドキュメントをちょっと改良
 // See: https://pkg.go.dev/net/http/httptest#example-ResponseRecorder
+// 今はこのメソッドを直接 main で実行して テストする(本当はテストコードに移行する)
 func TryResponseRecorder() {
 	handler := func(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, "<html><body>Hello World!</body></html>")
 	}
 
-	req := httptest.NewRequest("GET", "http://example.com/foo", nil)
+	r := httptest.NewRequest("GET", "http://example.com/foo", nil)
 	w := httptest.NewRecorder()
-	handler(w, req)
+	handler(w, r)
 
 	resp := w.Result()
-	body, _ := io.ReadAll(resp.Body)
+	greeting, _ := io.ReadAll(resp.Body)
 
 	fmt.Println(resp.StatusCode)
 	fmt.Println(resp.Header.Get("Content-Type"))
-	fmt.Println(string(body))
+
+	fmt.Printf("%s\n", greeting)
+	// fmt.Println(string(greeting))
 }
 
-// TryServer
+// TryServer 公式ドキュメントをちょっと改良
 // See: https://pkg.go.dev/net/http/httptest#example-Server
+// 今はこのメソッドを直接 main で実行して テストする(本当はテストコードに移行する)
 func TryServer() {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Hello, client")
 	}))
 	defer ts.Close()
 
-	res, err := http.Get(ts.URL)
-	if err != nil {
-		log.Fatal(err)
-	}
-	greeting, err := io.ReadAll(res.Body)
+	res, _ := http.Get(ts.URL)
+	greeting, _ := io.ReadAll(res.Body)
 	res.Body.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	fmt.Printf("%s\n", greeting)
 }
 
-// TryServerHttp2
+// TryServerHttp2 公式ドキュメントをちょっと改良
 // See: https://pkg.go.dev/net/http/httptest#example-Server-HTTP2
+// 今はこのメソッドを直接 main で実行して テストする(本当はテストコードに移行する)
 func TryServerHttp2() {
 	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, %s", r.Proto)
@@ -62,37 +60,25 @@ func TryServerHttp2() {
 	ts.StartTLS()
 	defer ts.Close()
 
-	res, err := ts.Client().Get(ts.URL)
-	if err != nil {
-		log.Fatal(err)
-	}
-	greeting, err := io.ReadAll(res.Body)
+	res, _ := ts.Client().Get(ts.URL)
+	greeting, _ := io.ReadAll(res.Body)
 	res.Body.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
+
 	fmt.Printf("%s\n", greeting)
 }
 
-// TryTLSServer
+// TryTLSServer 公式ドキュメントをちょっと改良
 // See: https://pkg.go.dev/net/http/httptest#example-NewTLSServer
+// 今はこのメソッドを直接 main で実行して テストする(本当はテストコードに移行する)
 func TryTLSServer() {
 	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Hello, client")
 	}))
 	defer ts.Close()
 
-	client := ts.Client()
-	res, err := client.Get(ts.URL)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	greeting, err := io.ReadAll(res.Body)
+	res, _ := ts.Client().Get(ts.URL)
+	greeting, _ := io.ReadAll(res.Body)
 	res.Body.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	fmt.Printf("%s\n", greeting)
 }

@@ -12,9 +12,12 @@ WORKDIR /go/src/$REPOSITORY
 
 # 本当は build だけで使える image を作成すべき
 # 相対パスで Dockerfile より上の階層は指定できないからコピーできなかった
-COPY . .
+COPY ./go.mod .
 # 毎回 build すると余計な image ばかり作っちゃうが go.mod を更新したら imgae 作り直してもいいかも
 RUN go mod download
+# もしかして COPY するファイルに変更が加わっているから 毎回 image が作り直される説がある
+# よってはじめは go.mod だけコピーして その後に ディレクトリごとコピーする
+COPY . .
 # そもそも go build したものを実行するから go のコマンドは使わないはず
 # CMD ["go" "run" "main.go"]
 # CMD [ "bash" ]

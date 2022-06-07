@@ -47,6 +47,7 @@ func main() {
 	// maintrainingCompress()
 	// mainAssetCalc()
 	// mainWebServer()
+	// mainWebServerTest()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -242,4 +243,11 @@ func mainWebServer() {
 	// webServer.MainTemplateComponent()
 	// webServer.MainOnceTemplate()
 	// webServer.MainCookie()
+}
+
+func mainWebServerTest() {
+	webServer.TryResponseRecorder()
+	// webServer.TryServer()
+	// webServer.TryServerHttp2()
+	// webServer.TryTLSServer()
 }

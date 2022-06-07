@@ -12,7 +12,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - レイヤードアーキテクチャの勉強: [サンプル01](./ddd01), [サンプル02](./ddd02)  
   - [Go 言語でのテスト方法](./docs/test_memo.md): [サンプル](./pkg03), [テスト駆動開発 書籍の要約](./docs/tdd_summary.md), [サンプル](./trainingTest)  
   - [Server を立てる](./docs/web_service.md): [サンプル](./webServer/webServer.go)  
-
+  - [ミドルウェア](./docs/web_service.md#ミドルウェア-について)
 
 - ふつうに練習した  
   - [Go Tour](./docs/go_tour.md): [サンプル](./goTour)  
@@ -33,7 +33,7 @@ Go 言語で様々なことをやってみる練習リポジトリ
   - [Go 言語の仕様](./docs/effective_go.md)  
   - [データ圧縮](./docs/compress_memo.md): [サンプル](./trainingCompress)  
   - [1度だけの実行](./docs/once_memo.md)  
-  - [http のテストコード](./docs/web_test.md): [サンプル](./webServer/webTest.go)  
+  - [http のテストコード](./docs/web_test.md): [サンプル](./webServer/webTest.go), [テストコード](./webServer/webTest_test.go)  
 
 ### 作ったもの
 

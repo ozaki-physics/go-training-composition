@@ -45,7 +45,7 @@ func TestAbs(t *testing.T) {
 }
 ```
 
-[サンプル](pkg03/example03_test.go) を `go test -v ./pkg03/example03_test.go` 実行したときの出力は  
+[サンプル](../pkg03/example03_test.go) を `go test -v ./pkg03/example03_test.go` 実行したときの出力は  
 
 ```console
 === RUN   TestAbs

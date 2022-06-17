@@ -47,6 +47,7 @@ func main() {
 	// maintrainingCompress()
 	// mainAssetCalc()
 	// mainWebServer()
+	// mainWebServerTest()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -220,7 +221,7 @@ func mainAssetCalc() {
 }
 
 func mainWebServer() {
-	// webServer.Main()
+	webServer.Main()
 	// webServer.MainHtml()
 	// webServer.MainUrl()
 	// webServer.MiddlewareRoot()
@@ -241,4 +242,12 @@ func mainWebServer() {
 	// webServer.MainTemplateInjection()
 	// webServer.MainTemplateComponent()
 	// webServer.MainOnceTemplate()
+	// webServer.MainCookie()
+}
+
+func mainWebServerTest() {
+	webServer.TryResponseRecorder()
+	// webServer.TryServer()
+	// webServer.TryServerHttp2()
+	// webServer.TryTLSServer()
 }

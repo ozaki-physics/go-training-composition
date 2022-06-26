@@ -11,14 +11,14 @@ import (
 func Main() {
 	// url := "https://www.ozaki-physics.com"
 	url := "http://www.google.com/robots.txt"
-	html := getHtml(url)
+	html := getStatusCode(url)
 	fmt.Println(html)
 }
 
-// getHtml
+// getStatusCode
 // 公式のサンプルを少し改良した
 // see: 公式によるサンプル https://pkg.go.dev/net/http@go1.17.7#example-Get
-func getHtml(url string) string {
+func getStatusCode(url string) string {
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)

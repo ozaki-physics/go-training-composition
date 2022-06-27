@@ -31,6 +31,10 @@ func init() {
 
 func main() {
 	mainPkg()
+	// よく使うやつ
+	// fileCrypto.RunFileDeCrypto()
+	// trainingWebScraping.GetTitle() // html の title を取得
+
 	// mainTimeZone()
 	// mainCrypto()
 	// ioFileVersion()

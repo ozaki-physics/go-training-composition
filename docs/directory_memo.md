@@ -138,3 +138,6 @@ func main() {
 特に docker の中で /go/src/github.com/ozaki-physics/go-training-composition がカレントディレクトリになるのが気になる
 
 `go fmt ./...` パッケージ全部に対して fmt をする
+
+go の パッケージ名を アンダースコアにするなら ディレクトリ名もアンダースコアにした方が良い  
+ディレクトリ名は キャメルケースで パッケージ名は アンダースコアって方法もできるけど import 文で 別名宣言しないといけなくなる  

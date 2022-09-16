@@ -145,3 +145,41 @@ path: / で
 `go install github.com/ramya-rao-a/go-outline@latest` を実行したら  
 /go/bin に go-outline が追加されて go.mod は編集されなかった  
 __go install では go.mod は変更されないから合っている__  
+
+## 参考書籍より
+『詳解Go言語Webアプリケーション開発』
+ISBNコード: 978-4-86354-372-0
+著者: 清水 陽一郎
+初版: 2022/08/01
+
+モジュール は バージョニングして リリースする単位  
+パッケージ は 特定のディレクトリに含まれているソースコードの総称  
+
+セマンティックバージョニング2.0.0 という規格?で go module は管理されている  
+
+Go Module は 依存先を確認するとき 極力古いモジュールのパッケージを利用するよう設計されている  
+
+バージョン違いのモジュールを import するとき `go get -u github.com/labstack/echo` じゃなくて `go get -u github.com/labstack/echo/v4` とする  
+呼び出すときは  
+```go
+import "github.com/labstack/echo/v4"
+func main() {
+	// v4.New() ではないことに注意
+	e := echo.New()
+}
+```
+
+依存先のコードにデバックコードを差し込む方法もある  
+- go mod vendor コマンド  
+- go.mod ファイルに replace ディレクティブ を記述  
+- Workspace モードを使う  
+
+go get コマンドを実行したら GitHub を直接参照せず 最初は プロキシサーバ で取得を試みる  
+また 取得したパッケージの真正性も チェックサムによって検証される  
+デフォルトのプロキシサーバは  
+- proxy.golang.org  
+- sum.golang.org  
+- index.golang.org  
+
+プライベートモジュールを使って開発するときは 環境変数 GOPRIVATE を設定する  
+プライベートパッケージになることが多いのは アクセスログのミドルウェア, リトライやタイムアウトなどの設定を行った *http.Client 型の値など  

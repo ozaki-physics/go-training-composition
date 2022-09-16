@@ -20,6 +20,7 @@ import (
 	"github.com/ozaki-physics/go-training-composition/trainingJson"
 	"github.com/ozaki-physics/go-training-composition/trainingTimeZone"
 	"github.com/ozaki-physics/go-training-composition/trainingWebScraping"
+	"github.com/ozaki-physics/go-training-composition/training_middleware"
 	"github.com/ozaki-physics/go-training-composition/utils"
 	"github.com/ozaki-physics/go-training-composition/webServer"
 )
@@ -52,6 +53,7 @@ func main() {
 	// mainAssetCalc()
 	// mainWebServer()
 	// mainWebServerTest()
+	mainMiddleware()
 }
 
 // mainPkg ディレクトリ構成を試す
@@ -228,7 +230,6 @@ func mainWebServer() {
 	webServer.Main()
 	// webServer.MainHtml()
 	// webServer.MainUrl()
-	// webServer.MiddlewareRoot()
 	// webServer.MainHttpMethod()
 	// webServer.MainFileServer()
 	// webServer.MainFileServer02()
@@ -254,4 +255,8 @@ func mainWebServerTest() {
 	// webServer.TryServer()
 	// webServer.TryServerHttp2()
 	// webServer.TryTLSServer()
+}
+
+func mainMiddleware() {
+	training_middleware.MiddlewareRoot()
 }

@@ -10,6 +10,7 @@ fileCrypto/key/*
 !fileCrypto/key/AES-CTR.key
 
 config/key.json
+trainingTwitter/secret.json
 
 # 以下は github で ignore ファイルを go 言語で作ったら default で生成されたもの
 # Binaries for programs and plugins
